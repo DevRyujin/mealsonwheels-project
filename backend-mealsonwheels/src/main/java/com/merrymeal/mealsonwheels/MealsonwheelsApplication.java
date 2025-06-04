@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MealsonwheelsApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(MealsonwheelsApplication.class, args);
 	}
 
