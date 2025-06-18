@@ -35,7 +35,7 @@ const navItemsByRole = {
     },
     { to: "/admin/menus", label: "Manage Menus" },
     { to: "/admin/deliveries", label: "Manage Deliveries" },
-    { to: "/admin/contact", label: "Contact" },
+    { to: "/admin/info", label: "Admin Info" },
   ],
 };
 
