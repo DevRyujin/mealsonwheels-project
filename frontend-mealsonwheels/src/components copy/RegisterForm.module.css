@@ -1,0 +1,64 @@
+.registerForm {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(149, 157, 165, 0.2);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.registerForm h2 {
+  text-align: center;
+  color: #1a202c;
+  margin-bottom: 1.5rem;
+}
+
+.registerForm input,
+.registerForm select {
+  padding: 12px 16px;
+  margin: 0.6rem 0 1.2rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.25s ease;
+  background: #f9fafb;
+  outline-offset: 2px;
+  color: #1a202c;
+}
+.registerForm input{
+    width: 93%;
+}
+.registerForm select{
+    width: 100%;
+}
+
+
+.registerForm input:focus,
+.registerForm select:focus {
+  border-color: #3b82f6;
+  background: #fff;
+}
+
+.registerForm button {
+    margin: 5px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.registerForm button:disabled {
+  background: #93c5fd;
+  cursor: not-allowed;
+}
+
+.registerForm button:hover:not(:disabled) {
+  background: #1e40af;
+}
