@@ -1,4 +1,4 @@
-package com.merrymeal.mealsonwheels_backend.exception;
+package com.merrymeal.mealsonwheels.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
