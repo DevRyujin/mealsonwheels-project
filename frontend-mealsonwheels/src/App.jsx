@@ -19,7 +19,19 @@ import MemberDashboard from './pages/MemberDashboard';
 import PartnerDashboard from './pages/PartnerDashboard';
 import VolunteerDashboard from './pages/VolunteerDashboard';
 
+<<<<<<< Updated upstream
 // Auth and test
+=======
+//import memberfeedback
+import MemberFeedback from './pages/MemberFeedback';
+
+//import partnersfoodsafety
+import PartnersFoodSafety from './pages/PartnersFoodSafety';
+
+//import registervolunteer
+import RegisterVolunteer from './pages/RegisterVolunteer';
+
+>>>>>>> Stashed changes
 import Login from './pages/Login';
 import Register from './pages/Register';
 import TestConnection from './pages/TestConnection';
@@ -32,6 +44,7 @@ function App() {
       <Header />
       <Navbar />
 
+<<<<<<< Updated upstream
       <Routes>
         {/* Admin routes */}
         <Route path="/admin/dashboard" element={
@@ -91,12 +104,25 @@ function App() {
             <VolunteerDashboard />
           </ProtectedRoute>
         } />
+=======
+        <Routes>
+          
+          <Route path='/login' element={<Login />} />
+          <Route path='/register' element={<Register />} />
+          
+          <Route path="/admin" element={
+            <ProtectedRoute allowedRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+>>>>>>> Stashed changes
 
         {/* Auth and testing */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/test" element={<TestConnection />} />
 
+<<<<<<< Updated upstream
         {/* Home */}
         <Route path="/" element={
           <div className="text-3xl font-bold underline p-8">
@@ -108,6 +134,39 @@ function App() {
           </div>
         } />
       </Routes>
+=======
+          <Route path='/member/memberfeedback' element={
+            <ProtectedRoute allowedRole="member">
+              <MemberFeedback />
+            </ProtectedRoute>} />
+
+          <Route path="/partner" element={
+            <ProtectedRoute allowedRole="partner">
+              <PartnerDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path='/partner/partnersfoodsafety' element={
+            <ProtectedRoute allowedRole="partner">
+              <PartnersFoodSafety />
+            </ProtectedRoute>} />
+
+          <Route path="/volunteer" element={
+            <ProtectedRoute allowedRole="volunteer">
+              <VolunteerDashboard />
+            </ProtectedRoute>
+          } />
+
+          <Route path='/volunteer/registervolunteer' element={
+            <ProtectedRoute allowedRole="volunteer">
+              <RegisterVolunteer />
+            </ProtectedRoute>} />
+
+          <Route path="/" element={<div className="text-3xl font-bold underline">Welcome to the home page!</div>} />
+        </Routes>
+
+      
+>>>>>>> Stashed changes
     </Router>
   );
 }
