@@ -15,9 +15,9 @@ import ManageDeliveries from './pages/admin/ManageDeliveries';
 import AdminInfo from './pages/admin/AdminInfo';
 
 // Other roles
-import MemberDashboard from './pages/MemberDashboard';
-import PartnerDashboard from './pages/PartnerDashboard';
-import VolunteerDashboard from './pages/VolunteerDashboard';
+import MemberDashboard from './pages/Member/MemberDashboard';
+import PartnerDashboard from './pages/Partner/PartnerDashboard';
+import VolunteerDashboard from './pages/Volunteer/VolunteerDashboard';
 
 // Member pages
 import Member_ConfirmOrder from './pages/Member/MemberConfirmOrder'; 

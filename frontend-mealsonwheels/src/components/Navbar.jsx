@@ -21,6 +21,7 @@ const navItemsByRole = {
     { to: "/menu", label: "Menu" },
     { to: "/deliveryHistory", label: "Delivery History" },
     { to: "/contact", label: "Contact" },
+    { to: "/member/confirm-order", label: "Confirm Order" },
   ],
   admin: [
     { to: "/admin/dashboard", label: "Dashboard" },
