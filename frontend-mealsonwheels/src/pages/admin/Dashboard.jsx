@@ -1,4 +1,30 @@
-export default function AdminDashboard() {
+import { useEffect, useState } from "react";
+import axiosInstance from "../../api/axiosInstance"; // adjust path if needed
+
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    members: 0,
+    meals: 0,
+    orders: 0,
+    donations: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await axiosInstance.get("/dashboard-stats");
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch dashboard stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
   return (
     <div className="max-w-8xl mx-auto">
       {/* Hero Section */}
@@ -28,22 +54,22 @@ export default function AdminDashboard() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 my-10 px-4">
         <div className="bg-gray-200 rounded-md p-6 text-center shadow">
           <h3 className="font-semibold text-lg">Members</h3>
-          <p className="text-2xl mt-2 font-bold">0</p>
+          <p className="text-2xl mt-2 font-bold">{loading ? "..." : stats.members}</p>
         </div>
 
         <div className="bg-gray-200 rounded-md p-6 text-center shadow">
           <h3 className="font-semibold text-lg">Meal Programs</h3>
-          <p className="text-2xl mt-2 font-bold">0</p>
+          <p className="text-2xl mt-2 font-bold">{loading ? "..." : stats.meals}</p>
         </div>
 
         <div className="bg-gray-200 rounded-md p-6 text-center shadow">
           <h3 className="font-semibold text-lg">Total Orders</h3>
-          <p className="text-2xl mt-2 font-bold">0</p>
+          <p className="text-2xl mt-2 font-bold">{loading ? "..." : stats.orders}</p>
         </div>
 
         <div className="bg-gray-200 rounded-md p-6 text-center shadow">
           <h3 className="font-semibold text-lg">Total Donations</h3>
-          <p className="text-2xl mt-2 font-bold">0</p>
+          <p className="text-2xl mt-2 font-bold">{loading ? "..." : stats.donations}</p>
         </div>
       </div>
     </div>
