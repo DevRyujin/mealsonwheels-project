@@ -1,9 +1,12 @@
-package com.merrymeal.mealsonwheels.service;
+package com.merrymeal.mealsonwheels.service.old;
 
 import com.merrymeal.mealsonwheels.dto.*;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
