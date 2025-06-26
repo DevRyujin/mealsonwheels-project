@@ -1,15 +1,14 @@
 package com.merrymeal.mealsonwheels.controller;
 
+import com.merrymeal.mealsonwheels.dto.AuthResponse;
 import com.merrymeal.mealsonwheels.dto.LoginRequest;
 import com.merrymeal.mealsonwheels.dto.LoginResponse;
 import com.merrymeal.mealsonwheels.dto.RegisterRequest;
-import com.merrymeal.mealsonwheels.security.JwtService;
 import com.merrymeal.mealsonwheels.service.AuthService;
 import com.merrymeal.mealsonwheels.service.RegistrationService;
 
 import java.util.HashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.Date;
@@ -60,12 +59,11 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
         try {
-            // Attempt login, get token if successful
-            String token = authService.login(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(new LoginResponse(token));
+            AuthResponse response = authService.login(loginRequest);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
-            // Return 401 Unauthorized with a helpful message
-            return ResponseEntity.status(401).body("Invalid email or password");
+            return ResponseEntity.status(401).body("Invalid email or password: " + e.getMessage());
         }
     }
+
 }

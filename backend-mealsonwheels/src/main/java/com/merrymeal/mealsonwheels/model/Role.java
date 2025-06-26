@@ -5,5 +5,8 @@ public enum Role {
     CAREGIVER,
     VOLUNTEER,
     PARTNER,
-    ADMIN
+    ADMIN,
+    DONOR,
+    RIDER,
+    SUPPORTER
 }

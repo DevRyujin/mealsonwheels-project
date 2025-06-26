@@ -17,15 +17,23 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public User getUser() {
-        return user; // for access if needed
+        return user;
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convert Role enum to ROLE_ format expected by Spring
+        if (user.getRole() == null) {
+            return Collections.emptyList(); // Or use ROLE_UNKNOWN if needed
+        }
+
         String roleName = "ROLE_" + user.getRole().name();
         return Collections.singletonList(new SimpleGrantedAuthority(roleName));
     }
+
 
     @Override
     public String getPassword() {
@@ -34,28 +42,26 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail(); // using email as a username
+        return user.getEmail();     // Using email as username
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return true; // change this if you want to implement logic
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true; // change this if you want to implement logic
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true; // change this if you want to implement logic
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true; // change this if you want to implement logic
+        return user.isApproved();
     }
-
-
 }

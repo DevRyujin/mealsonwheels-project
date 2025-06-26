@@ -1,4 +1,4 @@
-package com.merrymeal.mealsonwheels_backend.util;
+package com.merrymeal.mealsonwheels.util;
 
 public class DistanceUtil {
     private static final double EARTH_RADIUS_KM = 6371.0;

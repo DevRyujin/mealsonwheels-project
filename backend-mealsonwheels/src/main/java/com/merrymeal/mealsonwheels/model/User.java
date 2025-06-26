@@ -1,19 +1,26 @@
 package com.merrymeal.mealsonwheels.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "users")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
     private String email;
     private String phone;
 
-    // for Geolocation
+    // For Geolocation
     private String address;
     private Double latitude;
     private Double longitude;
@@ -22,6 +29,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(nullable = false)
+    private boolean approved = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private MemberProfile memberProfile;
@@ -35,110 +45,16 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private PartnerProfile partnerProfile;
 
-    public User() {
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private DonorProfile donorProfile;
 
-    public Long getId() {
-        return id;
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private AdminProfile adminProfile;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private RiderProfile riderProfile;
 
-    public String getName() {
-        return name;
-    }
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private SupporterProfile supporterProfile; // ✅ Added supporter profile
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public MemberProfile getMemberProfile() {
-        return memberProfile;
-    }
-
-    public void setMemberProfile(MemberProfile memberProfile) {
-        this.memberProfile = memberProfile;
-    }
-
-    public CaregiverProfile getCaregiverProfile() {
-        return caregiverProfile;
-    }
-
-    public void setCaregiverProfile(CaregiverProfile caregiverProfile) {
-        this.caregiverProfile = caregiverProfile;
-    }
-
-    public VolunteerProfile getVolunteerProfile() {
-        return volunteerProfile;
-    }
-
-    public void setVolunteerProfile(VolunteerProfile volunteerProfile) {
-        this.volunteerProfile = volunteerProfile;
-    }
-
-    public PartnerProfile getPartnerProfile() {
-        return partnerProfile;
-    }
-
-    public void setPartnerProfile(PartnerProfile partnerProfile) {
-        this.partnerProfile = partnerProfile;
-    }
 }

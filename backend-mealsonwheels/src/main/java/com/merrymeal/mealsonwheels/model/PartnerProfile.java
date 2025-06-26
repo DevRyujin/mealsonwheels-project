@@ -1,12 +1,22 @@
 package com.merrymeal.mealsonwheels.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "partner_profiles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PartnerProfile {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
@@ -15,40 +25,13 @@ public class PartnerProfile {
 
     private String companyName;
     private String partnershipDuration;
+    private String companyDescription;
+    private String companyAddress;
 
-    public PartnerProfile() {
+    private double companyLocationLat;
+    private double companyLocationLong;
 
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public String getPartnershipDuration() {
-        return partnershipDuration;
-    }
-
-    public void setPartnershipDuration(String partnershipDuration) {
-        this.partnershipDuration = partnershipDuration;
-    }
+    @OneToMany(mappedBy = "partner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RiderProfile> riders = new ArrayList<>();
 }

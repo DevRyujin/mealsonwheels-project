@@ -1,6 +1,6 @@
-package com.merrymeal.mealsonwheels_backend.test;
+package com.merrymeal.mealsonwheels.test;
 
-import com.merrymeal.mealsonwheels_backend.service.mealOrderService.LocationIQService;
+import com.merrymeal.mealsonwheels.service.mealOrderService.LocationIQService;
 
 public class LocationIQTestRunner {
 

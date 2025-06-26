@@ -1,32 +1,24 @@
 package com.merrymeal.mealsonwheels.service;
 
 import com.merrymeal.mealsonwheels.dto.*;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RegistrationService {
 
-
-    private UserRepository userRepository;
-
-
-    private MemberProfileRepository memberProfileRepository;
-
-
-    private CaregiverProfileRepository caregiverProfileRepository;
-
-
-    private VolunteerProfileRepository volunteerProfileRepository;
-
-
-    private PartnerProfileRepository partnerProfileRepository;
-
-
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final MemberProfileRepository memberProfileRepository;
+    private final CaregiverProfileRepository caregiverProfileRepository;
+    private final VolunteerProfileRepository volunteerProfileRepository;
+    private final PartnerProfileRepository partnerProfileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public RegistrationService(UserRepository userRepository,
                                MemberProfileRepository memberProfileRepository,
@@ -34,7 +26,6 @@ public class RegistrationService {
                                VolunteerProfileRepository volunteerProfileRepository,
                                PartnerProfileRepository partnerProfileRepository,
                                PasswordEncoder passwordEncoder) {
-
         this.userRepository = userRepository;
         this.memberProfileRepository = memberProfileRepository;
         this.caregiverProfileRepository = caregiverProfileRepository;
@@ -43,13 +34,16 @@ public class RegistrationService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void register(RegisterRequest request) {
-        // 1. Check if user exists
+    public UserDTO register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email Already Registered");
+            throw new IllegalArgumentException("Email is already registered");
         }
 
-        // 2. Create and save user
+        // ❌ Prevent ADMIN registration
+        if (request.getRole() == Role.ADMIN) {
+            throw new IllegalArgumentException("Registration as ADMIN is not allowed.");
+        }
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
@@ -59,51 +53,64 @@ public class RegistrationService {
         user.setLongitude(request.getLongitude());
         user.setRole(request.getRole());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setApproved(false); // ❗ default new user to unapproved
 
-        userRepository.save(user); // temporarily save before attaching profile
+        userRepository.save(user);
 
-        // 3. Save corresponding profile based on Role
         switch (request.getRole()) {
-            case MEMBER:
-                MemberProfileDTO memberDTO = new MemberProfileDTO();
-                MemberProfile member = new MemberProfile();
-                member.setUser(user);
-                member.setDietaryRestrictions(memberDTO.getDietaryRestrictions());
-                memberProfileRepository.save(member);
-                break;
-
-            case CAREGIVER:
-                CaregiverProfileDTO caregiverDTO = new CaregiverProfileDTO();
-                CaregiverProfile caregiver = new CaregiverProfile();
-                caregiver.setUser(user);
-                caregiver.setMemberAddressToAssist(caregiverDTO.getMemberAddressToAssist());
-                caregiver.setMemberPhoneNumberToAssist(caregiverDTO.getMemberPhoneNumberToAssist());
-                caregiver.setMemberAddressToAssist(caregiverDTO.getMemberAddressToAssist());
-                caregiver.setMemberRelationship(caregiverDTO.getMemberRelationship());
-                caregiverProfileRepository.save(caregiver);
-                break;
-
-            case VOLUNTEER:
-                VolunteerProfileDTO volunteerDTO = new VolunteerProfileDTO();
-                VolunteerProfile volunteer = new VolunteerProfile();
-                volunteer.setUser(user);
-                volunteer.setServiceType(volunteerDTO.getServiceType());
-                volunteer.setVolunteerDuration(volunteerDTO.getVolunteerDuration());
-                volunteer.setAvailableDays(volunteerDTO.getAvailableDays());
-                volunteerProfileRepository.save(volunteer);
-                break;
-
-            case PARTNER:
-                PartnerProfileDTO partnerDTO = new PartnerProfileDTO();
-                PartnerProfile partner = new PartnerProfile();
-                partner.setUser(user);
-                partner.setCompanyName(partnerDTO.getCompanyName());
-                partner.setPartnershipDuration(partnerDTO.getPartnershipDuration());
-                partnerProfileRepository.save(partner);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unsupported user role: " + request.getRole());
+            case MEMBER -> {
+                MemberProfileDTO dto = request.getMemberProfileDTO();
+                MemberProfile profile = new MemberProfile();
+                profile.setUser(user);
+                profile.setDietaryRestrictions(dto.getDietaryRestrictions());
+                memberProfileRepository.save(profile);
+            }
+            case CAREGIVER -> {
+                CaregiverProfileDTO dto = request.getCaregiverProfileDTO();
+                CaregiverProfile profile = new CaregiverProfile();
+                profile.setUser(user);
+                profile.setMemberPhoneNumberToAssist(dto.getMemberPhoneNumberToAssist());
+                profile.setMemberAddressToAssist(dto.getMemberAddressToAssist());
+                profile.setMemberRelationship(dto.getMemberRelationship());
+                caregiverProfileRepository.save(profile);
+            }
+            case VOLUNTEER -> {
+                VolunteerProfileDTO dto = request.getVolunteerProfileDTO();
+                VolunteerProfile profile = new VolunteerProfile();
+                profile.setUser(user);
+                profile.setAvailableDays(dto.getAvailableDays());
+                profile.setServiceType(dto.getServiceType());
+                profile.setVolunteerDuration(dto.getVolunteerDuration());
+                volunteerProfileRepository.save(profile);
+            }
+            case PARTNER -> {
+                PartnerProfileDTO dto = request.getPartnerProfileDTO();
+                PartnerProfile profile = new PartnerProfile();
+                profile.setUser(user);
+                profile.setCompanyName(dto.getCompanyName());
+                profile.setPartnershipDuration(dto.getPartnershipDuration());
+                partnerProfileRepository.save(profile);
+            }
+            default -> throw new IllegalArgumentException("Unsupported role: " + request.getRole());
         }
+
+        return mapToDTO(user); // Optional mapping method to UserDTO
     }
+
+    private UserDTO mapToDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .approved(user.isApproved())
+                .role(user.getRole())
+                .build();
+    }
+
+
 }
+

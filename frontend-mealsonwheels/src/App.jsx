@@ -53,7 +53,11 @@ function App() {
             <Dashboard />
           </ProtectedRoute>
         } />
-        <Route path="/admin/members" element={<ProtectedRoute allowedRole="admin"><MembersAndCaregivers /></ProtectedRoute>} />
+        <Route path="/admin/members" element={
+          <ProtectedRoute allowedRole="admin">
+            <MembersAndCaregivers />
+            </ProtectedRoute>
+        } />
         <Route path="/admin/partners" element={<ProtectedRoute allowedRole="admin"><CompanyPartners /></ProtectedRoute>} />
         <Route path="/admin/volunteers" element={<ProtectedRoute allowedRole="admin"><CompanyVolunteers /></ProtectedRoute>} />
         <Route path="/admin/feedbacks" element={<ProtectedRoute allowedRole="admin"><MemberFeedbacks /></ProtectedRoute>} />

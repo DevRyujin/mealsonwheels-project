@@ -1,84 +1,43 @@
 package com.merrymeal.mealsonwheels.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "caregiver_profiles")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CaregiverProfile {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_member_id")
     private User assignedMember;
+
+    @Column(length = 500)
+    private String qualificationsAndSkills;
 
     private String memberNameToAssist;
     private String memberPhoneNumberToAssist;
     private String memberAddressToAssist;
     private String memberRelationship;
 
+    private boolean approved = false; // default to false
 
-    public CaregiverProfile() {
-
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public User getAssignedMember() {
-        return assignedMember;
-    }
-
-    public void setAssignedMember(User assignedMember) {
-        this.assignedMember = assignedMember;
-    }
-
-    public String getMemberNameToAssist() {
-        return memberNameToAssist;
-    }
-
-    public void setMemberNameToAssist(String memberNameToAssist) {
-        this.memberNameToAssist = memberNameToAssist;
-    }
-
-    public String getMemberPhoneNumberToAssist() {
-        return memberPhoneNumberToAssist;
-    }
-
-    public void setMemberPhoneNumberToAssist(String memberPhoneNumberToAssist) {
-        this.memberPhoneNumberToAssist = memberPhoneNumberToAssist;
-    }
-
-    public String getMemberAddressToAssist() {
-        return memberAddressToAssist;
-    }
-
-    public void setMemberAddressToAssist(String memberAddressToAssist) {
-        this.memberAddressToAssist = memberAddressToAssist;
-    }
-
-    public String getMemberRelationship() {
-        return memberRelationship;
-    }
-
-    public void setMemberRelationship(String memberRelationship) {
-        this.memberRelationship = memberRelationship;
-    }
+    @OneToMany(mappedBy = "caregiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<MemberProfile> membersUnderCare = new ArrayList<>();
 }
