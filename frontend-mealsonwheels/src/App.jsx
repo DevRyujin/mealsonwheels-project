@@ -16,7 +16,7 @@ import AdminInfo from './pages/admin/AdminInfo';
 
 // Other roles
 import MemberDashboard from './pages/Member/MemberDashboard';
-import PartnerDashboard from './pages/Partner/PartnerDashboard';
+import PartnerDashboard from './pages/partner/partnerdashboard';
 import VolunteerDashboard from './pages/Volunteer/VolunteerDashboard';
 
 // Member pages
@@ -26,7 +26,7 @@ import MemberFeedback from './pages/Member/MemberFeedback'; // Make sure this ex
 
 // Partner pages
 import PartnerAddMenu from './pages/Partner/PartnerAddMenu';
-import PartnersFoodSafety from './pages/Partner/PartnersFoodSafety'; // Make sure this exists
+import PartnersFoodSafety from './pages/partner/partnersfoodsafety'; // Make sure this exists
 
 // Volunteer pages
 import VolunteerDeliveryStatus1 from './pages/Volunteer/VolunteerDeliveryStatus1';
@@ -39,6 +39,7 @@ import Register from './pages/Register';
 import TestConnection from './pages/TestConnection';
 
 import ProtectedRoute from './components/ProtectedRoute';
+import MenuPlanningPage from './pages/partner/MenuPlanning';
 
 function App() {
   return (
@@ -72,7 +73,8 @@ function App() {
         <Route path="/member/memberfeedback" element={<ProtectedRoute allowedRole="member"><MemberFeedback /></ProtectedRoute>} />
 
         {/* Partner routes */}
-        <Route path="/partner" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
+        <Route path="/partner/partnerdashboard" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
+        <Route path="/partner/MenuPlanning" element={<ProtectedRoute allowedRole="partner"><MenuPlanningPage /></ProtectedRoute>} />
         <Route path="/partner/add-menu" element={<ProtectedRoute allowedRole="partner"><PartnerAddMenu /></ProtectedRoute>} />
         <Route path="/partner/partnersfoodsafety" element={<ProtectedRoute allowedRole="partner"><PartnersFoodSafety /></ProtectedRoute>} />
 

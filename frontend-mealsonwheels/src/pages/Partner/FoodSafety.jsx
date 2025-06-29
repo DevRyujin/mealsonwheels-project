@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-export default function PartnersFoodSafety() {
+export default function FoodSafety() {
   const navigate = useNavigate();
 
   const safetyItems = [
@@ -53,7 +53,7 @@ export default function PartnersFoodSafety() {
 
       <div className="text-center mt-10">
         <button
-          onClick={() => navigate('/partner/MenuPlanning')}
+          onClick={() => navigate('/menu')}
           className="px-6 py-2 border border-black rounded hover:bg-gray-100 transition"
         >
           ← Back to menu
