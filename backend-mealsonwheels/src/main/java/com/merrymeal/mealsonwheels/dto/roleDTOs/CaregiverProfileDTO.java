@@ -14,6 +14,11 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 public class CaregiverProfileDTO {
+
+    private String caregiverName;
+    private String caregiverEmail;
+    private String caregiverPhone;
+
     private String assignedMember;
     private String memberNameToAssist;
     private String memberPhoneNumberToAssist;
@@ -24,5 +29,6 @@ public class CaregiverProfileDTO {
     private List<Long> memberIds; // Optional if you want to list members under care
     private List<MemberProfileDTO> memberDetails;
 
+    private boolean approved;
 
 }

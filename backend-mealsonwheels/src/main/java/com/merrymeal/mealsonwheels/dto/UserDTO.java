@@ -4,6 +4,8 @@ import com.merrymeal.mealsonwheels.model.Role;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,4 +21,6 @@ public class UserDTO {
     private Double longitude;
     private Role role;
     private boolean approved;
+
+    private List<String> dietaryRestrictions;
 }

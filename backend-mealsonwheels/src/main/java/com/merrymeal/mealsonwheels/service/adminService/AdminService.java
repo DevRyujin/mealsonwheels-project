@@ -1,6 +1,9 @@
 package com.merrymeal.mealsonwheels.service.adminService;
 
 import com.merrymeal.mealsonwheels.dto.*;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
 
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,6 +42,9 @@ public class AdminService {
 
         @Autowired
         private ReassessmentEvaluationService reassessmentEvaluationService;
+
+        @Autowired
+        private PartnerProfileRepository partnerProfileRepository;
 
         // ✅ Approve user registration
         public void approveUser(Long userId) {
@@ -70,13 +77,30 @@ public class AdminService {
         }
 
         private UserDTO convertToDTO(User user) {
+                String address = null;
+                List<String> dietaryRestrictions = null;
+                Double lat = null;
+                Double lng = null;
+
+                if (user.getRole() == Role.MEMBER && user.getMemberProfile() != null) {
+                        MemberProfile profile = user.getMemberProfile();
+                        address = profile.getAddress();
+                        dietaryRestrictions = profile.getDietaryRestrictions();
+                        lat = profile.getMemberLocationLat();
+                        lng = profile.getMemberLocationLong();
+                }
+
                 return UserDTO.builder()
                         .id(user.getId())
                         .name(user.getName())
-                        .phone(user.getPhone())
                         .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .address(address)
+                        .latitude(lat)
+                        .longitude(lng)
                         .role(user.getRole())
                         .approved(user.isApproved())
+                        .dietaryRestrictions(dietaryRestrictions)
                         .build();
         }
 
@@ -216,4 +240,107 @@ public class AdminService {
                         .memberId(eval.getMember() != null ? eval.getMember().getId() : null)
                         .build();
         }
+
+        public List<MemberProfileDTO> getAllApprovedMembersWithCaregiverInfo() {
+                return userRepository.findByRole(Role.MEMBER).stream()
+                        .filter(User::isApproved)
+                        .filter(user -> {
+                                MemberProfile member = user.getMemberProfile();
+                                return member != null && member.getCaregiver() != null;
+                        })
+                        .map(user -> {
+                                MemberProfile member = user.getMemberProfile();
+                                CaregiverProfile caregiver = member.getCaregiver();
+                                User caregiverUser = caregiver.getUser();
+
+                                return MemberProfileDTO.builder()
+                                        .name(user.getName())
+                                        .email(user.getEmail())
+                                        .phone(user.getPhone())
+                                        .approved(user.isApproved())
+                                        .address(member.getAddress())
+                                        .dietaryRestrictions(member.getDietaryRestrictions())
+                                        .memberLocationLat(member.getMemberLocationLat())
+                                        .memberLocationLong(member.getMemberLocationLong())
+                                        .caregiverId(caregiver.getId())
+                                        .caregiverName(caregiverUser.getName())
+                                        .caregiverEmail(caregiverUser.getEmail())
+                                        .caregiverPhone(caregiverUser.getPhone())
+                                        .build();
+                        })
+                        .collect(Collectors.toList());
+        }
+
+
+        public List<CaregiverProfileDTO> getAllApprovedCaregiversWithMemberInfo() {
+                return userRepository.findByRole(Role.CAREGIVER).stream()
+                        .filter(User::isApproved)
+                        .map(User::getCaregiverProfile)
+                        .filter(cg -> cg != null &&
+                                cg.getMemberNameToAssist() != null &&
+                                !cg.getMemberNameToAssist().isBlank())
+                        .map(cg -> {
+                                User caregiverUser = cg.getUser();
+                                return CaregiverProfileDTO.builder()
+                                        .caregiverName(caregiverUser.getName())
+                                        .caregiverEmail(caregiverUser.getEmail())
+                                        .caregiverPhone(caregiverUser.getPhone())
+                                        .memberNameToAssist(cg.getMemberNameToAssist())
+                                        .memberPhoneNumberToAssist(cg.getMemberPhoneNumberToAssist())
+                                        .memberAddressToAssist(cg.getMemberAddressToAssist())
+                                        .memberRelationship(cg.getMemberRelationship())
+                                        .qualificationsAndSkills(cg.getQualificationsAndSkills())
+                                        .approved(caregiverUser.isApproved())
+                                        .build();
+                        })
+                        .collect(Collectors.toList());
+        }
+
+
+        // Get approved members without caregivers
+        public List<UserDTO> getApprovedMembersWithoutCaregivers() {
+                return userRepository.findByRole(Role.MEMBER).stream()
+                        .filter(User::isApproved)
+                        .filter(user -> {
+                                MemberProfile member = user.getMemberProfile();
+                                return member != null && member.getCaregiver() == null;
+                        })
+                        .map(this::convertToDTO)
+                        .collect(Collectors.toList());
+        }
+
+        public PartnerProfileDTO mapToPartnerDTO(PartnerProfile profile) {
+                if (profile == null) return null;
+
+                return PartnerProfileDTO.builder()
+                        .companyName(profile.getCompanyName())
+                        .partnershipDuration(profile.getPartnershipDuration())
+                        .companyDescription(profile.getCompanyDescription())
+                        .companyAddress(profile.getCompanyAddress())
+                        .companyLocationLat(profile.getCompanyLocationLat())
+                        .companyLocationLong(profile.getCompanyLocationLong())
+
+                        // ✅ Add these from the associated User
+                        .email(profile.getUser() != null ? profile.getUser().getEmail() : null)
+                        .address(profile.getUser() != null ? profile.getUser().getAddress() : null)
+
+                        // Optional: Meal/Menu data
+                        .dishes(new ArrayList<>())
+                        .providedMeals(new ArrayList<>())
+                        .menus(new ArrayList<>())
+                        .build();
+        }
+
+
+        public List<PartnerProfileDTO> getApprovedPartners() {
+                return partnerProfileRepository.findAll().stream()
+                        .filter(p -> p.getUser() != null && p.getUser().isApproved())
+                        .map(this::mapToPartnerDTO)
+                        .collect(Collectors.toList());
+        }
+
+
+
+
+
 }

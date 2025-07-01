@@ -61,26 +61,6 @@ export default function AddMenuPage() {
           </button>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-red-700 text-white text-sm px-8 py-6 flex flex-col md:flex-row justify-between">
-        <div className="space-y-2">
-          <div className="font-semibold">ABOUT US</div>
-          <div>Price</div>
-          <div>Menu</div>
-          <div>Home</div>
-        </div>
-        <div className="space-y-2">
-          <div className="font-semibold">SERVICES</div>
-          <div>Delivery</div>
-          <div>Packaging</div>
-        </div>
-        <div className="space-y-2">
-          <div className="font-semibold">SCHEDULE</div>
-          <div>Hot Meals<br />Mon-Fri<br />9:00 am - 8:00 pm</div>
-          <div>Frozen Meals<br />Sat-Sun<br />Delivered within 10km</div>
-        </div>
-      </footer>
     </div>
   );
 }

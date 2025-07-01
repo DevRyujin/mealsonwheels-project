@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/error", "/api/auth/login", "/api/auth/register", "/api/auth/test").permitAll()
+                        .requestMatchers("/", "/health", "/error", "/api/auth/login", "/api/auth/register", "/api/auth/test").permitAll()
+                        .requestMatchers("/api/location").permitAll() // For Geolocation
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").hasRole("MEMBER")
                         .requestMatchers("/api/volunteer/**").hasRole("VOLUNTEER")

@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from "react-router-dom";
 
 const MealDetailsPage = () => {
   return (
@@ -34,36 +35,24 @@ const MealDetailsPage = () => {
             </div>
           </div>
 
-          <button className="border border-gray-500 rounded px-4 py-1 text-sm mb-3">Food Safety</button>
+          <NavLink
+            to="/food-safety"
+            className="inline-block border border-gray-500 rounded px-4 py-1 text-sm mb-3 transform transition-transform duration-150 active:scale-95"
+          >
+            Food Safety
+          </NavLink>
+
+
           <br />
-          <button className="border border-black rounded px-6 py-2 font-semibold hover:bg-gray-200">Order now</button>
+
+          <NavLink
+            to="/member/confirm-order"
+            className="inline-block border border-black rounded px-6 py-2 font-semibold hover:bg-gray-200 transform transition-transform duration-150 active:scale-95"
+          >
+            Order now
+          </NavLink>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-red-700 text-white p-4 text-sm grid grid-cols-3 gap-4 text-left">
-        <div>
-          <div className="font-semibold mb-2">ABOUT US</div>
-          <p>Price</p>
-          <p>Menu</p>
-          <p>Home</p>
-        </div>
-        <div>
-          <div className="font-semibold mb-2">SERVICES</div>
-          <p>Delivery</p>
-          <p>Packaging</p>
-        </div>
-        <div>
-          <div className="font-semibold mb-2">SCHEDULE</div>
-          <p>Hot Meals</p>
-          <p>Mon–Fri</p>
-          <p>9:00 am – 8:00 pm</p>
-          <br />
-          <p>Frozen Meals</p>
-          <p>Sat–Sun</p>
-          <p>Delivered within 10km</p>
-        </div>
-      </footer>
     </div>
   );
 };

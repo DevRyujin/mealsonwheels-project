@@ -1,11 +1,13 @@
 package com.merrymeal.mealsonwheels.service;
 
 import com.merrymeal.mealsonwheels.dto.*;
+import com.merrymeal.mealsonwheels.exception.AccountNotApprovedException;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import com.merrymeal.mealsonwheels.security.CustomUserDetails;
 import com.merrymeal.mealsonwheels.security.JwtTokenProvider;
 import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,31 +31,61 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(LoginRequest loginRequest) {
-        authenticationManager.authenticate(
+        // New
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (DisabledException e) {
+            throw new AccountNotApprovedException("Your account has not been approved yet by the admin.");
+        }
+
+
+
+
+        /*
+        // Debug code
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.getEmail(),
+                            loginRequest.getPassword()
+                    )
+            );
+        } catch (AuthenticationException e) {
+            throw new RuntimeException("Authentication failed: " + e.getMessage());
+        }*/
+
+
+        /*authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
                         loginRequest.getPassword()
                 )
-        );
+        ); */
 
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // ✅ Approval check
         if (!user.isApproved()) {
-            throw new RuntimeException("Account is not approved by admin yet.");
+            throw new AccountNotApprovedException("Your account has not been approved yet by the admin.");
         }
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
         String token = jwtTokenProvider.generateToken(userDetails, user.getId());
 
-        // ✅ Now build and return AuthResponse
+        // Create AuthResponse manually (no builder)
         AuthResponse response = new AuthResponse();
         response.setToken(token);
         response.setUserType(user.getRole().name());
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setMessage("Login successful");
+        response.setName(user.getName()); // Full name from user entity
 
         return response;
     }
@@ -63,4 +95,6 @@ public class AuthServiceImpl implements AuthService {
         // Delegate to RegistrationService if you want to reuse it
         throw new UnsupportedOperationException("Use RegistrationService for registration.");
     }
+
+
 }

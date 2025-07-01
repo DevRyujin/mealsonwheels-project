@@ -36,8 +36,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), HttpStatus.CONFLICT); // 409
     }
 
+    //@ExceptionHandler(Exception.class)
+    //public ResponseEntity<ErrorResponse> generalExceptionHandler(Exception ex) {
+    //    return new ResponseEntity<>(new ErrorResponse("An error occurred: " + ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    //}
+
+    // Debug
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> generalExceptionHandler(Exception ex) {
-        return new ResponseEntity<>(new ErrorResponse("An error occurred: " + ex.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Object> handleException(Exception ex) {
+        ex.printStackTrace(); // shows the exact cause in the terminal
+        return ResponseEntity.status(500).body(Map.of(
+                "status", 500,
+                "error", ex.getMessage(),
+                "message", "Something went wrong. Please try again."
+        ));
     }
+
+
 }

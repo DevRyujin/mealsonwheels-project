@@ -1,6 +1,9 @@
 package com.merrymeal.mealsonwheels.controller;
 
 import com.merrymeal.mealsonwheels.dto.*;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
 import com.merrymeal.mealsonwheels.service.adminService.AdminService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,4 +136,24 @@ public class AdminController {
     public ResponseEntity<List<ReassessmentEvaluationDTO>> getEvaluationsByMemberId(@PathVariable Long memberId) {
         return ResponseEntity.ok(adminService.getEvaluationsByMemberId(memberId));
     }
+
+    @GetMapping("/members-without-caregivers")
+    public ResponseEntity<List<UserDTO>> getMembersWithoutCaregivers() {
+        return ResponseEntity.ok(adminService.getApprovedMembersWithoutCaregivers());
+    }
+
+    @GetMapping("/caregivers-with-member-info")
+    public ResponseEntity<List<CaregiverProfileDTO>> getCaregiversWithMemberInfo() {
+        return ResponseEntity.ok(adminService.getAllApprovedCaregiversWithMemberInfo());
+    }
+
+    @GetMapping("/approved-partners")
+    public ResponseEntity<List<PartnerProfileDTO>> getApprovedPartners() {
+        List<PartnerProfileDTO> partners = adminService.getApprovedPartners();
+        return ResponseEntity.ok(partners);
+    }
+
+
+
+
 }
