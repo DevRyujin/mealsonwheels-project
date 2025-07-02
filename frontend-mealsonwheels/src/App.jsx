@@ -26,7 +26,7 @@ import MemberFeedback from './pages/Member/MemberFeedback'; // Make sure this ex
 
 // Partner pages
 import PartnerAddMenu from './pages/Partner/PartnerAddMenu';
-import PartnersFoodSafety from './pages/partner/partnersfoodsafety'; // Make sure this exists
+import PartnersFoodSafety from './pages/partner/PartnersFoodSafety'; // Make sure this exists
 
 // Volunteer pages
 import VolunteerDeliveryStatus1 from './pages/Volunteer/VolunteerDeliveryStatus1';
@@ -42,7 +42,7 @@ import ApprovalPendingPage from './pages/auth/ApprovalPendingPage.jsx';
 
 import ProtectedRoute from './components/ProtectedRoute';
 import MenuPlanningPage from './pages/partner/MenuPlanning';
-
+import Contact from './pages/Contact';
 
 // Public 
 import Home from './pages/Home.jsx';
@@ -96,6 +96,9 @@ function App() {
         <Route path="/test" element={<TestConnection />} />
         <Route path="/register/success" element={<RegistrationSuccessPage />} />
         <Route path='/login/approval' element={<ApprovalPendingPage />} />
+
+        {/* Public routes */}
+        <Route path="/contact" element={<Contact />} />
 
         {/* Home route */}
         <Route path="/" element={

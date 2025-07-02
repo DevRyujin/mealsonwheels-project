@@ -201,8 +201,8 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-8 mb-24 rounded-xl shadow-md bg-white">
-      <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">Create Account</h2>
+    <div className="max-w-lg mx-auto mt-10 p-12 mb-24 rounded-xl shadow-md bg-gradient-to-r from-orange-100 to-red-400">
+      <h2 className="text-3xl font-bold text-center text-indigo-900 mb-6">Create Account</h2>
       {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -213,7 +213,7 @@ const RegisterForm = () => {
 
         <div className="flex flex-col sm:flex-row gap-2">
           <input name="address" value={formData.address} onChange={handleChange} placeholder="Address" className={inputClass} />
-          <button type="button" onClick={getLocation} className="flex items-center justify-center bg-gradient-to-r from-orange-500 to-red-600 text-white px-4 py-3 rounded-xl shadow hover:brightness-110 transform transition-transform active:scale-95 whitespace-nowrap">📌 Get Location</button>
+          <button type="button" onClick={getLocation} className="flex items-center justify-center bg-gradient-to-r from-orange-300 to-red-600 text-white px-4 py-3 rounded-xl shadow hover:brightness-110 transform transition-transform active:scale-95 whitespace-nowrap">📌 Get Location</button>
         </div>
 
         <select name="role" value={role} onChange={(e) => setRole(e.target.value)} className={inputClass}>
@@ -324,7 +324,7 @@ const RegisterForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-red-600 text-white hover:brightness-110 transform transition-transform active:scale-95"
+            className="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-300 to-red-600 text-white hover:brightness-110 transform transition-transform active:scale-95"
           >
             {loading ? "Registering..." : "Register"}
           </button>

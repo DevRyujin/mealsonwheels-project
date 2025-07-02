@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axiosInstance";
 
-const inputClass = "w-full p-3 shadow rounded-xl border border-gray-300 focus:outline-none focus:border-blue-600 border-2 transition-all";
-
 const LoginForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -30,14 +28,12 @@ const LoginForm = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.post("/auth/login", formData);
-      const { token, userType, name } = response.data; // ✅ destructure name
+      const { token, userType, name } = response.data;
 
-      // ✅ Store everything in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("userType", userType.toLowerCase());
-      localStorage.setItem("userName", name); // ✅ now userName will show in HeaderNavbar
+      localStorage.setItem("userName", name);
 
-      // ✅ Redirect based on role
       switch (userType) {
         case "ROLE_ADMIN":
           navigate("/admin/dashboard");
@@ -73,49 +69,59 @@ const LoginForm = () => {
     }
   };
 
-
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="max-w-md w-full p-8 mb-24 border border-gray-300 rounded-xl shadow-md bg-white">
-        <h2 className="text-3xl font-bold text-center text-blue-800 mb-6">Login</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+      <div className="w-full max-w-sm">
+        <div className="bg-gradient-to-r from-orange-100 to-red-400 rounded-lg shadow-md p-12">
+          <div className="mb-6">
+            <h2 className="text-lg font-bold">Login to your account</h2>
+            <p className="text-sm text-gray-600">Enter your email below to login to your account</p>
+            <div className="mt-2">
+              <button className="text-sm font-semibold text-indigo-900 hover:underline" onClick={() => navigate("/register")}>Sign Up</button>
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
-            className={inputClass}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className={inputClass}
-          />
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-          <div className="flex justify-end gap-4 mt-6">
-            <button
-              type="button"
-              onClick={() => navigate("/")}
-              className="px-6 py-2 rounded-xl border border-gray-400 text-gray-700 hover:bg-gray-100 transform transition-transform active:scale-95"
-            >
-              Cancel
-            </button>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid gap-2">
+              <label htmlFor="email" className="text-sm font-medium">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="m@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded"
+              />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium">Password</label>
+                <a href="#" className="text-sm font-semibold text-indigo-900 hover:underline">Forgot your password?</a>
+              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-2 border border-gray-300 rounded"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white hover:brightness-110 transform transition-transform active:scale-95"
+              className="w-full bg-gradient-to-r from-orange-600 to-red-600 text-white py-2 rounded hover:bg-gray-800"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
