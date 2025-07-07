@@ -2,10 +2,7 @@ package com.merrymeal.mealsonwheels.service.roleService;
 
 import com.merrymeal.mealsonwheels.dto.order.OrderDTO;
 import com.merrymeal.mealsonwheels.dto.order.OrderMealDTO;
-import com.merrymeal.mealsonwheels.model.Order;
-import com.merrymeal.mealsonwheels.model.OrderMeal;
-import com.merrymeal.mealsonwheels.model.RiderProfile;
-import com.merrymeal.mealsonwheels.model.User;
+import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.OrderRepository;
 import com.merrymeal.mealsonwheels.repository.RiderProfileRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
@@ -59,7 +56,7 @@ public class RiderServiceImpl implements RiderService {
 
         User user = rider.getUser();
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "RIDER");
+        UserValidationUtil.checkRole(user, Role.RIDER);
 
         return rider;
     }

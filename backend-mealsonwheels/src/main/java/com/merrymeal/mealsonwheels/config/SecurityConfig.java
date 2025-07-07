@@ -33,7 +33,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/error", "/api/auth/login", "/api/auth/register", "/api/auth/test").permitAll()
+                        .requestMatchers("/", "/health", "/error", "/api/auth/login", "/api/auth/register", "/api/auth/test").permitAll()
+                        .requestMatchers("/api/location").permitAll() // For Geolocation
+                        .requestMatchers("/api/donor/donate").permitAll() // allow public access
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/member/**").hasRole("MEMBER")
                         .requestMatchers("/api/volunteer/**").hasRole("VOLUNTEER")
@@ -42,6 +44,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/partner/**").hasRole("PARTNER")
                         .requestMatchers("/api/supporter/**").hasRole("SUPPORTER")
                         .requestMatchers("/api/donor/**").hasRole("DONOR")
+
+
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(daoAuthenticationProvider())

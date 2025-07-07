@@ -9,6 +9,8 @@ import com.merrymeal.mealsonwheels.service.RegistrationService;
 
 import java.util.HashMap;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import java.util.Date;
@@ -46,6 +48,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegisterRequest registerRequest) {
+        System.out.println("Incoming register request: " + registerRequest); // ✅ DEBUG
+
         try {
             registrationService.register(registerRequest);
             return ResponseEntity.ok("Registration successful!");
@@ -57,13 +61,34 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         try {
             AuthResponse response = authService.login(loginRequest);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(401).body("Invalid email or password: " + e.getMessage());
         }
+    }
+
+    // For logout logic
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(HttpServletRequest request) {
+        // 1. Get Authorization header
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Invalid or missing token");
+        }
+
+        // 2. Extract token
+        String token = authHeader.substring(7);
+
+        // 3. Optionally blacklist the token or invalidate it
+        // e.g., tokenBlacklistService.add(token);
+        System.out.println("Logging out token: " + token); // optional log
+
+        // 4. Respond
+        return ResponseEntity.ok("Logout successful");
     }
 
 }

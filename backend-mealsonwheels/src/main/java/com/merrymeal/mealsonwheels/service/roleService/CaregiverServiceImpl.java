@@ -4,6 +4,7 @@ import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 import com.merrymeal.mealsonwheels.model.CaregiverProfile;
 import com.merrymeal.mealsonwheels.model.MemberProfile;
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
@@ -28,7 +29,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         return mapToCaregiverProfileDTO(user.getCaregiverProfile());
     }
@@ -38,7 +39,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         CaregiverProfile caregiverProfile = user.getCaregiverProfile();
 
@@ -56,7 +57,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         return user.getCaregiverProfile().getMembersUnderCare()
                 .stream()
@@ -71,7 +72,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User caregiverUser = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(caregiverUser);
-        UserValidationUtil.checkRole(caregiverUser, "CAREGIVER");
+        UserValidationUtil.checkRole(caregiverUser, Role.CAREGIVER);
 
         User memberUser = userRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -90,36 +91,51 @@ public class CaregiverServiceImpl implements CaregiverService {
     // === Mapping Helpers ===
 
     private CaregiverProfileDTO mapToCaregiverProfileDTO(CaregiverProfile caregiver) {
+        User caregiverUser = caregiver.getUser();
+
         return CaregiverProfileDTO.builder()
+                .caregiverName(caregiverUser.getName())
+                .caregiverEmail(caregiverUser.getEmail())
+                .caregiverPhone(caregiverUser.getPhone())
+
                 .assignedMember(caregiver.getAssignedMember() != null ? caregiver.getAssignedMember().getEmail() : null)
                 .memberNameToAssist(caregiver.getMemberNameToAssist())
                 .memberPhoneNumberToAssist(caregiver.getMemberPhoneNumberToAssist())
                 .memberAddressToAssist(caregiver.getMemberAddressToAssist())
                 .memberRelationship(caregiver.getMemberRelationship())
                 .qualificationsAndSkills(caregiver.getQualificationsAndSkills())
+
                 .memberIds(caregiver.getMembersUnderCare().stream()
-                        .map(MemberProfile::getId)
+                        .map(member -> member.getUser().getId())
+                        .collect(Collectors.toList()))
+
+                .memberDetails(caregiver.getMembersUnderCare().stream()
+                        .map(this::mapToMemberProfileDTO)
                         .collect(Collectors.toList()))
                 .build();
     }
 
     private MemberProfileDTO mapToMemberProfileDTO(MemberProfile member) {
         User user = member.getUser();
-        if (user == null) {
-            throw new RuntimeException("MemberProfile is not linked to a User.");
-        }
+        CaregiverProfile caregiver = member.getCaregiver();
+        User caregiverUser = (caregiver != null) ? caregiver.getUser() : null;
 
         return MemberProfileDTO.builder()
-                .username(user.getName()) // If username not needed, remove this line
-                .email(user.getEmail())   // If missing in DTO, remove this too
-                .phoneNumber(user.getPhone())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
                 .address(member.getAddress())
-                .dietaryRestrictions(member.getDietaryRestrictions())  // ✅ Fixed name
+                .dietaryRestrictions(member.getDietaryRestrictions())
                 .approved(user.isApproved())
                 .memberLocationLat(member.getMemberLocationLat())
                 .memberLocationLong(member.getMemberLocationLong())
-                .caregiverId(member.getCaregiver() != null ? member.getCaregiver().getId() : null)
+
+                .caregiverId(caregiver != null ? caregiver.getId() : null)
+                .caregiverName(caregiverUser != null ? caregiverUser.getName() : null)
+                .caregiverEmail(caregiverUser != null ? caregiverUser.getEmail() : null)
+                .caregiverPhone(caregiverUser != null ? caregiverUser.getPhone() : null)
                 .build();
     }
+
 
 }

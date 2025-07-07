@@ -2,9 +2,7 @@ package com.merrymeal.mealsonwheels.service.roleService;
 
 import com.merrymeal.mealsonwheels.dto.TaskDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
-import com.merrymeal.mealsonwheels.model.Task;
-import com.merrymeal.mealsonwheels.model.User;
-import com.merrymeal.mealsonwheels.model.VolunteerProfile;
+import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.TaskRepository;
 import com.merrymeal.mealsonwheels.repository.VolunteerProfileRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
@@ -45,7 +43,7 @@ public class VolunteerServiceImpl implements VolunteerService {
 
         User user = volunteer.getUser();
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "VOLUNTEER");
+        UserValidationUtil.checkRole(user, Role.VOLUNTEER);
 
         return volunteer;
     }
@@ -54,7 +52,7 @@ public class VolunteerServiceImpl implements VolunteerService {
         User user = v.getUser();
 
         return VolunteerProfileDTO.builder()
-                .id(user.getId()) // ✅ FIXED: use user ID
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .phone(user.getPhone())
@@ -64,12 +62,16 @@ public class VolunteerServiceImpl implements VolunteerService {
                 .role(user.getRole())
                 .approved(user.isApproved())
                 .serviceType(v.getServiceType())
-                .availableDays(v.getAvailableDays())
+                .availableDays(
+                        v.getAvailableDays() != null
+                                ? v.getAvailableDays().stream()
+                                .map(DayOfWeek::getLabel)
+                                .collect(Collectors.toSet())
+                                : null
+                )
                 .volunteerDuration(v.getVolunteerDuration())
                 .build();
     }
-
-
 
     private TaskDTO mapToTaskDTO(Task task) {
         return TaskDTO.builder()

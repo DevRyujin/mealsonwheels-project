@@ -10,7 +10,7 @@ export default function CompanyPartners() {
         const fetchPartners = async () => {
             setLoading(true);
             try {
-                const res = await axiosInstance.get("/partners");
+                const res = await axiosInstance.get("/admin/approved-partners");
                 setPartners(res.data);
             } catch (err) {
                 console.error("Error fetching partners:", err);

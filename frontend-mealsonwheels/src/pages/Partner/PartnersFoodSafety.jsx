@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function PartnersFoodSafety() {
   const navigate = useNavigate();
+  const [backPath, setBackPath] = useState('/');
+
+  useEffect(() => {
+    const userType = localStorage.getItem('userType');
+    if (userType === 'partner') {
+      setBackPath('/partner/MenuPlanning');
+    } else if (userType === 'member') {
+      setBackPath('/member/meal-order');
+    } else {
+      setBackPath('/'); // fallback
+    }
+  }, []);
 
   const safetyItems = [
     {
@@ -53,7 +65,7 @@ export default function PartnersFoodSafety() {
 
       <div className="text-center mt-10">
         <button
-          onClick={() => navigate('/partner/MenuPlanning')}
+          onClick={() => navigate(backPath)}
           className="px-6 py-2 border border-black rounded hover:bg-gray-100 transition"
         >
           ← Back to menu

@@ -32,21 +32,24 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtConfig.getJwtExpirationInMs());
 
-        // Fallback in case role is missing
         String role = userDetails.getAuthorities().stream()
                 .findFirst()
                 .map(auth -> auth != null ? auth.getAuthority() : "ROLE_UNKNOWN")
                 .orElse("ROLE_UNKNOWN");
 
         return Jwts.builder()
-                .setSubject(userDetails.getUsername()) // email
+                .setSubject(userDetails.getUsername())
                 .claim("userId", userId)
                 .claim("role", role)
+                .claim("authorities", userDetails.getAuthorities().stream()
+                        .map(auth -> auth.getAuthority())
+                        .toList())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
 
 

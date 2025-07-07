@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.util.List;
 
 @Getter
 @Setter
@@ -14,16 +15,22 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class MemberProfileDTO {
 
-    private String username;
+    private String name;
     private String email;
-    private String phoneNumber;
-    private boolean approved;
+    private String phone;
 
-    private String dietaryRestrictions;
+    private List<String> dietaryRestrictions;
+
     private String address;
     private double memberLocationLat;
     private double memberLocationLong;
 
     private Long caregiverId;
-}
 
+    private boolean approved; // optional: keep if needed by logic
+
+    // ✅ These must be present
+    private String caregiverName;
+    private String caregiverEmail;
+    private String caregiverPhone;
+}

@@ -1,6 +1,7 @@
 package com.merrymeal.mealsonwheels.util;
 
 import com.merrymeal.mealsonwheels.model.User;
+import com.merrymeal.mealsonwheels.model.Role;
 
 public class UserValidationUtil {
 
@@ -10,9 +11,9 @@ public class UserValidationUtil {
         }
     }
 
-    public static void checkRole(User user, String expectedRole) {
-        if (user.getRole() == null || !expectedRole.equalsIgnoreCase(user.getRole().name())) {
-            throw new RuntimeException("User is not a " + expectedRole.toLowerCase());
+    public static void checkRole(User user, Role expectedRole) {
+        if (user.getRole() != expectedRole) {
+            throw new RuntimeException("User is not a " + expectedRole.name().toLowerCase());
         }
     }
 
