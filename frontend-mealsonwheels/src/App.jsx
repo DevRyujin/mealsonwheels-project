@@ -48,10 +48,10 @@ import Contact from './pages/Contact';
 import Home from './pages/Home.jsx';
 
 // Donation
-import DonateAmountPage from './Donation/DonateAmountPage.jsx';
-import BillingDetails from './Donation/BillingDetails.jsx';
-import DonatePayment from './Donation/DonatePayment.jsx'
-import DonateComplete from './Donation/DonationCompletion.jsx'
+import DonateAmountPage from './pages/Donation/DonateAmountPage.jsx';
+import BillingDetails from './pages/Donation/BillingDetails.jsx';
+import DonatePayment from './pages/Donation/DonatePayment.jsx'
+import DonateComplete from './pages/Donation/DonationCompletion.jsx'
 
 // Share Pages
 import RedirectFoodSafety from './pages/Shared/RedirectFoodSafety';
