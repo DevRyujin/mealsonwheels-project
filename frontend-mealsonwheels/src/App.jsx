@@ -27,7 +27,6 @@ import MemberFeedback from './pages/Member/MemberFeedback'; // Make sure this ex
 // Partner pages
 import PartnerAddMenu from './pages/Partner/PartnerAddMenu';
 import PartnersFoodSafety from './pages/partner/PartnersFoodSafety'; // Make sure this exists
-import PartnersFoodSafety from './pages/partner/PartnersFoodSafety'; // Make sure this exists
 
 // Volunteer pages
 import VolunteerDeliveryStatus1 from './pages/Volunteer/VolunteerDeliveryStatus1';
