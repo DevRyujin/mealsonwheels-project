@@ -4,11 +4,14 @@ import com.merrymeal.mealsonwheels.dto.*;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -45,6 +48,9 @@ public class AdminService {
 
         @Autowired
         private PartnerProfileRepository partnerProfileRepository;
+
+        @Autowired
+        private VolunteerProfileRepository volunteerProfileRepository;
 
         // ✅ Approve user registration
         public void approveUser(Long userId) {
@@ -231,6 +237,8 @@ public class AdminService {
                         .map(this::mapToEvaluationDTO);
         }
 
+        // ============== INFO CARD ==============
+
         private ReassessmentEvaluationDTO mapToEvaluationDTO(ReassessmentEvaluation eval) {
                 return ReassessmentEvaluationDTO.builder()
                         .id(eval.getId())
@@ -338,6 +346,87 @@ public class AdminService {
                         .map(this::mapToPartnerDTO)
                         .collect(Collectors.toList());
         }
+
+        public VolunteerProfileDTO mapToVolunteerDTO(VolunteerProfile volunteer) {
+                if (volunteer == null) return null;
+
+                return VolunteerProfileDTO.builder()
+                        .serviceType(volunteer.getServiceType())
+                        .availableDays(
+                                volunteer.getAvailableDays() != null
+                                        ? volunteer.getAvailableDays().stream()
+                                        .map(DayOfWeek::getLabel) // "Monday", "Tuesday", etc.
+                                        .collect(Collectors.toSet())
+                                        : null
+                        )
+                        .volunteerDuration(volunteer.getVolunteerDuration())
+                        .name(volunteer.getUser() != null ? volunteer.getUser().getName() : null)
+                        .email(volunteer.getUser() != null ? volunteer.getUser().getEmail() : null)
+                        .address(volunteer.getUser() != null ? volunteer.getUser().getAddress() : null)
+                        .phone(volunteer.getUser() != null ? volunteer.getUser().getPhone() : null)
+                        .build();
+        }
+
+
+        public List<VolunteerProfileDTO> getApprovedVolunteers() {
+                return volunteerProfileRepository.findAll().stream()
+                        .filter(v -> v.getUser() != null && v.getUser().isApproved())
+                        .map(this::mapToVolunteerDTO)
+                        .collect(Collectors.toList());
+        }
+
+        public UserDTO getLoggedInAdminInfo() {
+                String email = getCurrentLoggedInEmail();
+                User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+                return mapUserToDTO(user);
+        }
+
+        public UserDTO updateAdminInfo(UserDTO updateDTO) {
+                String email = getCurrentLoggedInEmail();
+                User user = userRepository.findByEmail(email)
+                        .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+                updateDTO.setEmail(null);
+
+                user.setName(updateDTO.getName());
+                user.setPhone(updateDTO.getPhone());
+                user.setAge(updateDTO.getAge());
+                user.setAddress(updateDTO.getAddress());
+                user.setLatitude(updateDTO.getLatitude());
+                user.setLongitude(updateDTO.getLongitude());
+
+                userRepository.save(user);
+                return mapUserToDTO(user);
+        }
+
+
+        // Helper to get current email
+        private String getCurrentLoggedInEmail() {
+                Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                if (principal instanceof UserDetails userDetails) {
+                        return userDetails.getUsername(); // email
+                } else {
+                        return principal.toString();
+                }
+        }
+
+        private UserDTO mapUserToDTO(User user) {
+                return UserDTO.builder()
+                        .id(user.getId())
+                        .name(user.getName())
+                        .email(user.getEmail())
+                        .phone(user.getPhone())
+                        .age(user.getAge())
+                        .address(user.getAddress())
+                        .latitude(user.getLatitude())
+                        .longitude(user.getLongitude())
+                        .role(user.getRole())
+                        .approved(user.isApproved())
+                        .build();
+        }
+
 
 
 

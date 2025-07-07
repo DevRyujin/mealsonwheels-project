@@ -18,4 +18,14 @@ public enum DayOfWeek {
     public String getLabel() {
         return label;
     }
+
+    // For converting label to enum
+    public static DayOfWeek fromLabel(String label) {
+        for (DayOfWeek day : DayOfWeek.values()) {
+            if (day.getLabel().equalsIgnoreCase(label)) {
+                return day;
+            }
+        }
+        throw new IllegalArgumentException("Invalid day label: " + label);
+    }
 }

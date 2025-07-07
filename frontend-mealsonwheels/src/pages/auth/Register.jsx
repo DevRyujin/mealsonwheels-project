@@ -77,13 +77,16 @@ const RegisterForm = () => {
   {/* For Available Days */}
   const handleCheckboxChange = (e) => {
     const { name, value, checked } = e.target;
+    const val = value.toUpperCase();
+
     setFormData((prev) => {
       const updated = new Set(prev[name]);
-      if (checked) updated.add(value);
-      else updated.delete(value);
+      if (checked) updated.add(val);
+      else updated.delete(val);
       return { ...prev, [name]: Array.from(updated) };
     });
   };
+
 
   {/* For Dietary Restrictions */}
   const handleDietaryChange = (e) => {
@@ -282,33 +285,54 @@ const RegisterForm = () => {
         )}
 
         {role === "VOLUNTEER" && (
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700">Type of Service</label>
-              <select
-                name="serviceType"
-                value={formData.serviceType}
-                onChange={handleChange}
-                className={inputClass}
-              >
-                <option value="">Select Service</option>
-                <option value="KITCHEN">Kitchen</option>
-                <option value="DELIVERY">Delivery</option>
-                <option value="PACKAGE">Package</option>
-              </select>
-            </div>
-            <div>
-              <label htmlFor="volunteerDuration" className="block text-sm font-medium text-gray-700">Volunteer Duration</label>
-              <input
-                name="volunteerDuration"
-                value={formData.volunteerDuration}
-                onChange={handleChange}
-                type="date"
-                className={inputClass}
-              />
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700">Type of Service</label>
+            <select
+              name="serviceType"
+              value={formData.serviceType}
+              onChange={handleChange}
+              className={inputClass}
+            >
+              <option value="">Select Service</option>
+              <option value="KITCHEN">Kitchen</option>
+              <option value="DELIVERY">Delivery</option>
+              <option value="PACKAGE">Package</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="volunteerDuration" className="block text-sm font-medium text-gray-700">Volunteer Duration</label>
+            <input
+              name="volunteerDuration"
+              value={formData.volunteerDuration}
+              onChange={handleChange}
+              type="date"
+              className={inputClass}
+            />
+          </div>
+
+          {/* ✅ NEW: Available Days */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Available Days</label>
+            <div className="flex flex-wrap gap-4 mt-1">
+              {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"].map((day) => (
+                <label key={day} className="inline-flex items-center gap-2 text-sm text-gray-800">
+                  <input
+                    type="checkbox"
+                    name="availableDays"
+                    value={day}
+                    checked={formData.availableDays.includes(day)}
+                    onChange={handleCheckboxChange}
+                    className="accent-blue-600"
+                  />
+                  {day.charAt(0) + day.slice(1).toLowerCase()}
+                </label>
+              ))}
             </div>
           </div>
-        )}
+        </div>
+      )}
+
 
           
         

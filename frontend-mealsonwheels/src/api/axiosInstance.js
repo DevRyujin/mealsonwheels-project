@@ -10,15 +10,25 @@ const axiosInstance = axios.create({
 
 // Request Interceptor (Attach JWT Token)
 axiosInstance.interceptors.request.use(
-    (config) => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return(config);
-    },
-    (error) => Promise.reject(error)
+  (config) => {
+    const token = localStorage.getItem("token");
+
+    const publicRoutes = ["/api/donor/donate", "/api/auth/login", "/api/auth/register"];
+    const isPublic = publicRoutes.some(route => config.url.includes(route));
+
+    if (token && !isPublic) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    console.log("➡️ Request to:", config.url);
+    console.log("➡️ Token attached?", !!config.headers.Authorization);
+
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
+
+
 
 axiosInstance.interceptors.response.use(
   (response) => response,

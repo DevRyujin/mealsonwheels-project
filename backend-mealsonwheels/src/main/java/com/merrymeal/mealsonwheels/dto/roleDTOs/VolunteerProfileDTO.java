@@ -16,13 +16,8 @@ import java.util.Set;
 public class VolunteerProfileDTO extends UserDTO {
 
     private ServiceType serviceType;
-    private Set<DayOfWeek> availableDays;
+    private Set<String> availableDays;
     private String volunteerDuration;
-
-    // Optional legacy-style support (if needed)
-    public String getAvailableDaysAsString() {
-        return availableDays != null ? String.join(", ", availableDays.stream().map(Enum::name).toList()) : "";
-    }
 
     public String getServiceTypeAsString() {
         return serviceType != null ? serviceType.name() : "";

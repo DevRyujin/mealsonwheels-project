@@ -1,6 +1,7 @@
 package com.merrymeal.mealsonwheels.service.roleService;
 
 import com.merrymeal.mealsonwheels.dto.roleDTOs.SupporterProfileDTO;
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.model.SupporterProfile;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.repository.SupporterProfileRepository;
@@ -25,7 +26,7 @@ public class SupporterServiceImpl implements SupporterService {
         // Validation on user
         User user = supporter.getUser();
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "SUPPORTER");
+        UserValidationUtil.checkRole(user, Role.SUPPORTER);
 
         return SupporterProfileDTO.builder()
                 .id(user.getId()) // user ID
