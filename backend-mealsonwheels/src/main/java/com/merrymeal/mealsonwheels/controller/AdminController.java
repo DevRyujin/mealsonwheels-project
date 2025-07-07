@@ -4,6 +4,8 @@ import com.merrymeal.mealsonwheels.dto.*;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
+import com.merrymeal.mealsonwheels.model.VolunteerProfile;
 import com.merrymeal.mealsonwheels.service.adminService.AdminService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -151,6 +153,22 @@ public class AdminController {
     public ResponseEntity<List<PartnerProfileDTO>> getApprovedPartners() {
         List<PartnerProfileDTO> partners = adminService.getApprovedPartners();
         return ResponseEntity.ok(partners);
+    }
+
+    @GetMapping("/approved-volunteers")
+    public ResponseEntity<List<VolunteerProfileDTO>> getApprovedVolunteers() {
+        List<VolunteerProfileDTO> volunteer = adminService.getApprovedVolunteers();
+        return  ResponseEntity.ok(volunteer);
+    }
+
+    @GetMapping("/admin-info")
+    public ResponseEntity<UserDTO> getAdminInfo() {
+        return ResponseEntity.ok(adminService.getLoggedInAdminInfo());
+    }
+
+    @PutMapping("/admin-info")
+    public ResponseEntity<UserDTO> updateAdminInfo(@RequestBody UserDTO updatedDTO) {
+        return ResponseEntity.ok(adminService.updateAdminInfo(updatedDTO));
     }
 
 

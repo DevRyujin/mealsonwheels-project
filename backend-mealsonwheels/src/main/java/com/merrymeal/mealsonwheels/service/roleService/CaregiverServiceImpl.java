@@ -4,6 +4,7 @@ import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 import com.merrymeal.mealsonwheels.model.CaregiverProfile;
 import com.merrymeal.mealsonwheels.model.MemberProfile;
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
@@ -28,7 +29,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         return mapToCaregiverProfileDTO(user.getCaregiverProfile());
     }
@@ -38,7 +39,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         CaregiverProfile caregiverProfile = user.getCaregiverProfile();
 
@@ -56,7 +57,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User user = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "CAREGIVER");
+        UserValidationUtil.checkRole(user, Role.CAREGIVER);
 
         return user.getCaregiverProfile().getMembersUnderCare()
                 .stream()
@@ -71,7 +72,7 @@ public class CaregiverServiceImpl implements CaregiverService {
         User caregiverUser = userRepository.findById(caregiverId)
                 .orElseThrow(() -> new RuntimeException("Caregiver not found"));
         UserValidationUtil.checkApproved(caregiverUser);
-        UserValidationUtil.checkRole(caregiverUser, "CAREGIVER");
+        UserValidationUtil.checkRole(caregiverUser, Role.CAREGIVER);
 
         User memberUser = userRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("Member not found"));

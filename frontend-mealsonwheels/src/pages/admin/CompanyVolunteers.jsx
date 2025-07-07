@@ -10,7 +10,7 @@ export default function CompanyVolunteers() {
         const fetchVolunteers = async () => {
             setLoading(true);
             try {
-                const res = await axiosInstance.get("/volunteers");
+                const res = await axiosInstance.get("/admin/approved-volunteers");
                 setVolunteers(res.data);
             } catch (err) {
                 console.error("Error fetching volunteers:", err);
@@ -20,6 +20,20 @@ export default function CompanyVolunteers() {
         };
         fetchVolunteers();
     }, []);
+
+    const formatServiceType = (type) => {
+        switch (type) {
+            case "KITCHEN":
+                return "Kitchen";
+            case "DELIVERY":
+                return "Delivery";
+            case "PACKAGE":
+                return "Package";
+            default:
+                return type;
+        }
+    };
+
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen">
@@ -47,14 +61,23 @@ export default function CompanyVolunteers() {
                                 {volunteer.name}
                             </h2>
                             <h3 className="text-center text-sm text-gray-600 mb-3 italic">
-                                {volunteer.volunteerDuration}
+                                <p><span>Exp: {volunteer.volunteerDuration}</span></p> 
                             </h3>
                             <div className="text-sm text-gray-700 space-y-1">
                                 <p><span className="font-semibold">Address:</span> {volunteer.address}</p>
                                 <p><span className="font-semibold">Email:</span> {volunteer.email}</p>
                                 <p><span className="font-semibold">Phone:</span> {volunteer.phone}</p>
-                                <p><span className="font-semibold">Service:</span> {volunteer.service}</p>
-                                <p><span className="font-semibold">Availability:</span> {volunteer.availableDays}</p>
+                                <p>
+                                    <span className="font-semibold">Service:</span>{" "}
+                                    {formatServiceType(volunteer.serviceType)}
+                                </p>
+
+                                <p>
+                                <span className="font-semibold">Availability:</span>{" "}
+                                {Array.isArray(volunteer.availableDays)
+                                    ? volunteer.availableDays.join(", ")
+                                    : volunteer.availableDays}
+                                </p>
                             </div>
                         </div>
                     ))

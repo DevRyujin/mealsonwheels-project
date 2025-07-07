@@ -4,6 +4,7 @@ import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 import com.merrymeal.mealsonwheels.model.CaregiverProfile;
 import com.merrymeal.mealsonwheels.model.MemberProfile;
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.repository.MemberProfileRepository;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
@@ -64,7 +65,7 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "MEMBER");
+        UserValidationUtil.checkRole(user, Role.MEMBER);
 
         MemberProfile member = user.getMemberProfile();
         if (member == null) {

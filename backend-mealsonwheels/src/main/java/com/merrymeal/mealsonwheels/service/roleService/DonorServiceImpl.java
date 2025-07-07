@@ -4,12 +4,14 @@ import com.merrymeal.mealsonwheels.dto.UserDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.DonorProfileDTO;
 import com.merrymeal.mealsonwheels.model.DonorProfile;
 import com.merrymeal.mealsonwheels.model.User;
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import com.merrymeal.mealsonwheels.repository.DonorProfileRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
 import com.merrymeal.mealsonwheels.util.UserValidationUtil;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,6 +22,8 @@ public class DonorServiceImpl implements DonorService {
 
     private final DonorProfileRepository donorProfileRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public DonorProfileDTO getCurrentDonorProfile() {
@@ -43,7 +47,7 @@ public class DonorServiceImpl implements DonorService {
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "DONOR");
+        UserValidationUtil.checkRole(user, Role.DONOR);
 
         DonorProfile donorProfile = user.getDonorProfile();
         if (donorProfile == null) {
@@ -86,28 +90,54 @@ public class DonorServiceImpl implements DonorService {
             throw new IllegalArgumentException("Invalid donation amount.");
         }
 
-        try {
-            Long userId = SecurityUtil.getCurrentUserId(); // try to get logged-in user
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        DonorProfile donorProfile;
+        User user;
 
-            DonorProfile donorProfile = user.getDonorProfile();
-            if (donorProfile == null) {
-                donorProfile = DonorProfile.builder()
-                        .user(user)
-                        .totalDonatedAmount(BigDecimal.ZERO)
+        if (dto.getUser() != null && dto.getUser().getEmail() != null) {
+            String email = dto.getUser().getEmail();
+
+            // Try to find existing user
+            user = userRepository.findByEmail(email).orElse(null);
+
+            if (user == null) {
+                // Create new user for donation
+                user = User.builder()
+                        .name(dto.getUser().getName())
+                        .email(email)
+                        .phone(dto.getUser().getPhone())
+                        .address(dto.getUser().getAddress())
+                        .role(Role.DONOR)
+                        .approved(true) // Assume approved for donation
                         .build();
             }
 
-            donorProfile.addDonation(amount);
-            donorProfileRepository.save(donorProfile);
+            // Get or create donor profile
+            donorProfile = donorProfileRepository.findByUserId(user.getId()).orElse(null);
 
-        } catch (Exception e) {
-            // Log as anonymous donation (or store it later if needed)
-            System.out.println("Anonymous/public donation received: " + amount);
-            // Optionally, store in a separate `AnonymousDonation` table
+            if (donorProfile == null) {
+                donorProfile = DonorProfile.builder()
+                        .user(user)
+                        .donorType(dto.getDonorType())
+                        .build();
+            }
+
+        } else {
+            throw new RuntimeException("User information is required for donations.");
         }
+
+        // Add donation and card info
+        donorProfile.addDonation(amount);
+        donorProfile.setCardHolderName(dto.getCardHolderName());
+        donorProfile.setCardType(dto.getCardType());
+        donorProfile.setCardNumberMasked(dto.getCardNumberMasked());
+        donorProfile.setExpiryMonth(dto.getExpiryMonth());
+        donorProfile.setExpiryYear(dto.getExpiryYear());
+
+        userRepository.save(user);               // Save or update user
+        donorProfileRepository.save(donorProfile); // Save or update donor profile
     }
+
+
 
 
 }

@@ -68,7 +68,7 @@ public class PartnerServiceImpl implements PartnerService {
 
         User user = partnerProfile.getUser();
         UserValidationUtil.checkApproved(user);
-        UserValidationUtil.checkRole(user, "PARTNER");
+        UserValidationUtil.checkRole(user, Role.PARTNER);
 
         return partnerProfile;
     }

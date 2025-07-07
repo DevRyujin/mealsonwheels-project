@@ -10,12 +10,13 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder // ✅ Not @Builder
+@SuperBuilder
 public class UserDTO {
     private Long id;
     private String name;
     private String email;
     private String phone;
+    private Integer age;
     private String address;
     private Double latitude;
     private Double longitude;

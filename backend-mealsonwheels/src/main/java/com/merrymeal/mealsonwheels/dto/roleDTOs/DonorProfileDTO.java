@@ -26,6 +26,6 @@ public class DonorProfileDTO {
 
     private LocalDateTime lastDonationDate;
 
-    // ✅ Embed full user info
+    // Embed full user info
     private UserDTO user;
 }

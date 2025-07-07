@@ -40,7 +40,7 @@ public class DonorProfile {
     public void addDonation(BigDecimal amount) {
         if (amount != null) {
             this.totalDonatedAmount = this.totalDonatedAmount.add(amount);
-            this.lastDonationDate = LocalDateTime.now(); // ✅ accurate timestamp
+            this.lastDonationDate = LocalDateTime.now(); // accurate timestamp
         }
     }
 }
