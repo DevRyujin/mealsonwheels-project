@@ -27,6 +27,7 @@ import MemberFeedback from './pages/Member/MemberFeedback'; // Make sure this ex
 // Partner pages
 import PartnerAddMenu from './pages/Partner/PartnerAddMenu';
 import PartnersFoodSafety from './pages/partner/PartnersFoodSafety'; // Make sure this exists
+import PartnersFoodSafety from './pages/partner/PartnersFoodSafety'; // Make sure this exists
 
 // Volunteer pages
 import VolunteerDeliveryStatus1 from './pages/Volunteer/VolunteerDeliveryStatus1';
@@ -82,6 +83,8 @@ function App() {
         <Route path="/partner/dashboard" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
         <Route path="/partner/MenuPlanning" element={<ProtectedRoute allowedRole="partner"><MenuPlanningPage /></ProtectedRoute>} />
         <Route path="/partner/create-menu" element={<ProtectedRoute allowedRole="partner"><PartnerAddMenu /></ProtectedRoute>} />
+        <Route path="/partner/partnerdashboard" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
+        <Route path="/partner/add-menu" element={<ProtectedRoute allowedRole="partner"><PartnerAddMenu /></ProtectedRoute>} />
         <Route path="/partner/partnersfoodsafety" element={<ProtectedRoute allowedRole="partner"><PartnersFoodSafety /></ProtectedRoute>} />
 
         {/* Volunteer routes */}
