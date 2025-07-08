@@ -3,17 +3,6 @@ import React from 'react';
 const MemberDashboard = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Top Navbar */}
-      <header className="bg-red-700 text-white flex justify-between items-center px-6 py-4">
-        <div className="font-bold text-lg">🍽️ MEALS ON WHEELS</div>
-        <nav className="hidden md:flex gap-6">
-          <a href="#" className="hover:underline">HOME</a>
-          <a href="#" className="hover:underline">ABOUT</a>
-          <a href="#" className="hover:underline">SERVICES</a>
-          <a href="#" className="hover:underline">FAQ</a>
-        </nav>
-        <button className="bg-white text-red-700 px-4 py-2 rounded hover:bg-gray-200">Logout</button>
-      </header>
 
       {/* Sub Navbar */}
       <nav className="bg-blue-900 text-white flex flex-wrap justify-between items-center px-6 py-3 text-sm">
@@ -28,7 +17,7 @@ const MemberDashboard = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-cover bg-center text-white text-center py-24 px-4" style={{ backgroundImage: "url('https://www.shutterstock.com/image-photo/various-spices-herbs-on-black-260nw-1458918983.jpg')" }}>
+      <section className="bg-cover bg-center text-white text-center py-24 px-4" style={{ backgroundImage: " " }}>
         <h1 className="text-3xl font-bold mb-2">HEALTHY MEALS FROM THE COMFORT OF HOME</h1>
         <p className="text-lg">Enjoy flavorful, well-balanced meals without the hassle</p>
       </section>
