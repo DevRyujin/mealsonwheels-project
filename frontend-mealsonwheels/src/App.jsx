@@ -76,7 +76,7 @@ function App() {
 
         {/* Member routes */}
         <Route path="/member" element={<ProtectedRoute allowedRole="member"><MemberDashboard /></ProtectedRoute>} />
-        <Route path="/member/meal-order" element={<ProtectedRoute allowedRole="member"><Member_MealOrder /></ProtectedRoute>} />
+        <Route path="/member/order" element={<ProtectedRoute allowedRole="member"><Member_MealOrder /></ProtectedRoute>} />
         <Route path="/member/confirm-order" element={<ProtectedRoute allowedRole="member"><Member_ConfirmOrder /></ProtectedRoute>} />
         <Route path="/member/memberfeedback" element={<ProtectedRoute allowedRole="member"><MemberFeedback /></ProtectedRoute>} />
         <Route path="/member/foodsafety" element={<ProtectedRoute allowedRole="member"><PartnersFoodSafety /></ProtectedRoute>} />

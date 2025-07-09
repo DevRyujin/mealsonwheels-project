@@ -20,6 +20,7 @@ const navItemsByRole = {
   ],
   member: [
     { to: "/member/dashboard", label: "Dashboard" },
+    { to: "/member/caregiver", label: "Caregiver" },
     { to: "/member/order", label: "Orders" },
     { to: "/member/meal-order", label: "Menu" },
     { to: "/member/delivery-history", label: "Delivery History" },
