@@ -20,9 +20,10 @@ import PartnerDashboard from './pages/partner/partnerdashboard';
 import VolunteerDashboard from './pages/Volunteer/VolunteerDashboard';
 
 // Member pages
-import Member_ConfirmOrder from './pages/Member/MemberConfirmOrder'; 
-import Member_MealOrder from './pages/Member/MemberMealOrder';
+import MemberConfirmOrder from './pages/Member/MemberConfirmOrder'; 
+import MemberMealOrder from './pages/Member/MemberMealOrder';
 import MemberFeedback from './pages/Member/MemberFeedback'; // Make sure this exists
+import MemberCaregiver from './pages/Member/MemberCaregiver.jsx';
 
 // Partner pages
 import PartnerAddMenu from './pages/Partner/PartnerAddMenu';
@@ -41,11 +42,13 @@ import RegistrationSuccessPage from './pages/auth/RegisterSuccessPage';
 import ApprovalPendingPage from './pages/auth/ApprovalPendingPage.jsx';
 
 import ProtectedRoute from './components/ProtectedRoute';
-import MenuPlanningPage from './pages/partner/MenuPlanning';
-import Contact from './pages/Contact';
 
 // Public 
 import Home from './pages/Home.jsx';
+import About from './pages/About.jsx';
+import Services from './pages/Services.jsx';
+import Contact from './pages/Contact';  
+import FoodSafety from './pages/FoodSafety.jsx';
 
 // Donation
 import DonateAmountPage from './pages/Donation/DonateAmountPage.jsx';
@@ -53,8 +56,6 @@ import BillingDetails from './pages/Donation/BillingDetails.jsx';
 import DonatePayment from './pages/Donation/DonatePayment.jsx'
 import DonateComplete from './pages/Donation/DonationCompletion.jsx'
 
-// Share Pages
-import RedirectFoodSafety from './pages/Shared/RedirectFoodSafety';
 
 function App() {
   return (
@@ -75,22 +76,19 @@ function App() {
         <Route path="/admin/info" element={<ProtectedRoute allowedRole="admin"><AdminInfo /></ProtectedRoute>} />
 
         {/* Member routes */}
-        <Route path="/member" element={<ProtectedRoute allowedRole="member"><MemberDashboard /></ProtectedRoute>} />
-        <Route path="/member/order" element={<ProtectedRoute allowedRole="member"><Member_MealOrder /></ProtectedRoute>} />
-        <Route path="/member/confirm-order" element={<ProtectedRoute allowedRole="member"><Member_ConfirmOrder /></ProtectedRoute>} />
+        <Route path="/member/dashboard" element={<ProtectedRoute allowedRole="member"><MemberDashboard /></ProtectedRoute>} />
+        <Route path="/member/membercaregiver" element={<ProtectedRoute allowedRole="member"><MemberCaregiver /></ProtectedRoute>} />
+        <Route path="/member/meal-order" element={<ProtectedRoute allowedRole="member"><MemberMealOrder /></ProtectedRoute>} />
+        <Route path="/member/confirm-order" element={<ProtectedRoute allowedRole="member"><MemberConfirmOrder /></ProtectedRoute>} />
         <Route path="/member/memberfeedback" element={<ProtectedRoute allowedRole="member"><MemberFeedback /></ProtectedRoute>} />
-        <Route path="/member/foodsafety" element={<ProtectedRoute allowedRole="member"><PartnersFoodSafety /></ProtectedRoute>} />
-        
-        {/* Shared pages */}
-        <Route path="/food-safety" element={<RedirectFoodSafety />} />
 
         {/* Partner routes */}
         <Route path="/partner/dashboard" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
-        <Route path="/partner/MenuPlanning" element={<ProtectedRoute allowedRole="partner"><MenuPlanningPage /></ProtectedRoute>} />
         <Route path="/partner/create-menu" element={<ProtectedRoute allowedRole="partner"><PartnerAddMenu /></ProtectedRoute>} />
         <Route path="/partner/partnerdashboard" element={<ProtectedRoute allowedRole="partner"><PartnerDashboard /></ProtectedRoute>} />
         <Route path="/partner/add-menu" element={<ProtectedRoute allowedRole="partner"><PartnerAddMenu /></ProtectedRoute>} />
         <Route path="/partner/partnersfoodsafety" element={<ProtectedRoute allowedRole="partner"><PartnersFoodSafety /></ProtectedRoute>} />
+
 
         {/* Volunteer routes */}
         <Route path="/volunteer" element={<ProtectedRoute allowedRole="volunteer"><VolunteerDashboard /></ProtectedRoute>} />
@@ -107,6 +105,9 @@ function App() {
 
         {/* Public routes */}
         <Route path="/contact" element={<Contact />} />
+        <Route path="/foodsafety" element={<FoodSafety />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/about" element={<About />} />
 
         {/* Donation routes */}
         <Route path='/donate' element={<DonateAmountPage/>} />

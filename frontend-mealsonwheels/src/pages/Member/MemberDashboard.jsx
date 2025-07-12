@@ -1,62 +1,56 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 
 const MemberDashboard = () => {
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen flex flex-col">
-
-      {/* Sub Navbar */}
-      <nav className="bg-blue-900 text-white flex flex-wrap justify-between items-center px-6 py-3 text-sm">
-        <div className="flex gap-4">
-          <a href="#" className="hover:underline">Dashboard</a>
-          <a href="#" className="hover:underline">Orders</a>
-          <a href="#" className="hover:underline">Menu</a>
-          <a href="#" className="hover:underline">Delivery History</a>
-          <a href="#" className="hover:underline">Contact</a>
-        </div>
-        <div className="font-semibold">Andrei Santos <span className="text-blue-300 ml-2">MEMBER</span></div>
-      </nav>
-
+    <div className="max-w-8xl mx-auto">
       {/* Hero Section */}
-      <section className="bg-cover bg-center text-white text-center py-24 px-4" style={{ backgroundImage: " " }}>
-        <h1 className="text-3xl font-bold mb-2">HEALTHY MEALS FROM THE COMFORT OF HOME</h1>
-        <p className="text-lg">Enjoy flavorful, well-balanced meals without the hassle</p>
-      </section>
+      <div className="relative h-[530px] overflow-hidden">
+        <img
+          src="/images/MDashboardBG.png"
+          alt="vegetables"
+          className="absolute w-full bottom-0 h-[530px] object-cover object-bottom"
+        />
+        <h1 className="absolute z-10 text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold top-40 transform -translate-y-1/2 text-center px-4 w-full">
+          HEALTHY MEALS FROM THE <br className="hidden sm:block" />
+          COMFORT OF HOME
+        </h1>
+        <h2 className="absolute z-10 text-white text-lg sm:text-lg md:text-lg lg:text-2xl font-semibold top-60 transform -translate-y-1/2 text-center px-4 w-full">
+          Enjoy flavorful, well-balanced meals without the hassle
+        </h2>
+      </div>
 
       {/* Dashboard Cards */}
-      <section className="bg-white py-10 px-6 grid md:grid-cols-3 gap-6 text-center">
-        <div className="bg-gray-100 p-6 rounded shadow-md">
-          <h2 className="text-xl font-semibold mb-2">Your Meal Dashboard</h2>
-          <p>Track your meal deliveries, update dietary preferences, and stay on top of your nutrition</p>
+      <section className="bg-white py-28 px-20 grid md:grid-cols-3 gap-20 text-center">
+        <div>
+          <h2 className="text-2xl font-semibold mb-2">Your Meal Dashboard</h2>
+          <p className="font-medium">Track your meal deliveries, update dietary preferences, and stay on top of your nutrition</p>
         </div>
-        <div className="bg-gray-100 p-6 rounded shadow-md">
-          <h2 className="text-xl font-semibold mb-2">View Menu</h2>
-          <p>Browse our section of meals</p>
+
+        <div>
+          <h2 className="text-2xl font-semibold mb-2">View Menu</h2>
+          <p className="font-medium mb-3">Browse our section of meals</p>
+          <button
+            onClick={() => navigate('/member/meal-order')}
+            className="inline-block px-4 py-2 bg-indigo-900 text-white rounded hover:bg-indigo-800"
+          >
+            Browse Meals
+          </button>
         </div>
-        <div className="bg-gray-100 p-6 rounded shadow-md">
-          <h2 className="text-xl font-semibold mb-2">My Orders</h2>
-          <p>View your order history</p>
+
+        <div>
+          <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
+          <p className="font-medium mb-3">View your order history</p>
+          <button
+            onClick={() => navigate('/member/order')}
+            className="inline-block px-4 py-2 bg-indigo-900 text-white rounded hover:bg-indigo-800"
+          >
+            View Orders
+          </button>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-red-700 text-white px-6 py-8 grid md:grid-cols-3 gap-6 text-sm">
-        <div>
-          <h4 className="font-semibold mb-2">ABOUT US</h4>
-          <p>Price</p>
-          <p>Menu</p>
-          <p>Home</p>
-        </div>
-        <div>
-          <h4 className="font-semibold mb-2">SERVICES</h4>
-          <p>Delivery</p>
-          <p>Packaging</p>
-        </div>
-        <div>
-          <h4 className="font-semibold mb-2">SCHEDULE</h4>
-          <p>Hot Meals<br />Mon–Fri<br />9:00 am – 8:00 pm</p>
-          <p className="mt-2">Frozen Meals<br />Sat–Sun<br />Delivered within 10km</p>
-        </div>
-      </footer>
     </div>
   );
 };

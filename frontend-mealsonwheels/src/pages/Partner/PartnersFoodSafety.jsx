@@ -65,10 +65,10 @@ export default function PartnersFoodSafety() {
 
       <div className="text-center mt-10">
         <button
-          onClick={() => navigate(backPath)}
+          onClick={() => navigate('/partner/create-menu')}
           className="px-6 py-2 border border-black rounded hover:bg-gray-100 transition"
         >
-          ← Back to menu
+          ← Back to Menu
         </button>
       </div>
     </div>

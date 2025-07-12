@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import logo from "../assets/logo.png";
+import logo from "/images/logo.png";
 
 const navItemsByRole = {
   admin: [
@@ -20,16 +20,13 @@ const navItemsByRole = {
   ],
   member: [
     { to: "/member/dashboard", label: "Dashboard" },
-    { to: "/member/caregiver", label: "Caregiver" },
+    { to: "/member/membercaregiver", label: "Caregiver" },
     { to: "/member/order", label: "Orders" },
     { to: "/member/meal-order", label: "Menu" },
-    { to: "/member/delivery-history", label: "Delivery History" },
   ],
   partner: [
     { to: "/partner/dashboard", label: "Dashboard" },
-    { to: "/partner/deliveries", label: "Deliveries" },
     { to: "/partner/reassessment", label: "Reassessment" },
-    { to: "/partner/menu", label: "Menu" },
     { to: "/partner/create-menu", label: "Create Menu" },
   ],
   volunteer: [
@@ -54,6 +51,7 @@ export default function HeaderNavbar() {
       { to: "/menus", label: "Menus" },
       { to: "/volunteerpage", label: "Volunteer" },
       { to: "/partnerpage", label: "Partner" },
+      { to: "/foodsafety", label: "Food Safety" }
     ];
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
