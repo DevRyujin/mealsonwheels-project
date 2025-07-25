@@ -24,13 +24,17 @@ public class Meal {
     private String mealName;
 
     @Lob
-    @Column(name = "meal_photo")
+    @Column(name = "meal_photo", columnDefinition = "LONGBLOB")
     private byte[] mealPhoto;
+
+    @Column(name = "meal_photo_type")
+    private String mealPhotoType;
 
     @Column(length = 1000)
     private String mealDesc;
 
-    private String mealType;
+    @Enumerated(EnumType.STRING)
+    private MealType mealType;
 
     @Builder.Default
     private String mealDietary = "";

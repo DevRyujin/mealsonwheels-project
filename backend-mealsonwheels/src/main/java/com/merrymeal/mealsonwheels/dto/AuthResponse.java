@@ -1,5 +1,8 @@
 package com.merrymeal.mealsonwheels.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AuthResponse {
     private String token;
     private String userType;
@@ -22,6 +25,17 @@ public class AuthResponse {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    private UserDTO user;
+
+    // Getter and Setter
+    public UserDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserDTO user) {
+        this.user = user;
     }
 
     public Long getUserId() {

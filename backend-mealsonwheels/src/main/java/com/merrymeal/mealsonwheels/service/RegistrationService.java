@@ -1,10 +1,7 @@
 package com.merrymeal.mealsonwheels.service;
 
 import com.merrymeal.mealsonwheels.dto.*;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.*;
 import com.merrymeal.mealsonwheels.model.DayOfWeek;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
@@ -22,6 +19,7 @@ public class RegistrationService {
     private final CaregiverProfileRepository caregiverProfileRepository;
     private final VolunteerProfileRepository volunteerProfileRepository;
     private final PartnerProfileRepository partnerProfileRepository;
+    private final RiderProfileRepository riderProfileRepository;
     private final PasswordEncoder passwordEncoder;
 
     public RegistrationService(UserRepository userRepository,
@@ -29,12 +27,14 @@ public class RegistrationService {
                                CaregiverProfileRepository caregiverProfileRepository,
                                VolunteerProfileRepository volunteerProfileRepository,
                                PartnerProfileRepository partnerProfileRepository,
+                               RiderProfileRepository riderProfileRepository,
                                PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.memberProfileRepository = memberProfileRepository;
         this.caregiverProfileRepository = caregiverProfileRepository;
         this.volunteerProfileRepository = volunteerProfileRepository;
         this.partnerProfileRepository = partnerProfileRepository;
+        this.riderProfileRepository = riderProfileRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -119,8 +119,45 @@ public class RegistrationService {
                 profile.setUser(user);
                 profile.setCompanyName(dto.getCompanyName());
                 profile.setPartnershipDuration(dto.getPartnershipDuration());
+                profile.setCompanyDescription(dto.getCompanyDescription());
+
+                // ✅ Reuse user geolocation and address
+                profile.setCompanyAddress(user.getAddress());
+                profile.setCompanyLocationLat(user.getLatitude());
+                profile.setCompanyLocationLong(user.getLongitude());
+
                 partnerProfileRepository.save(profile);
             }
+            case RIDER -> {
+                RiderProfileDTO dto = request.getRiderProfileDTO();
+                RiderProfile profile = new RiderProfile(); // You must have this model
+
+                profile.setUser(user);
+
+                if (dto.getAvailableDays() != null) {
+                    try {
+                        Set<DayOfWeek> dayEnums = dto.getAvailableDays().stream()
+                                .map(DayOfWeek::fromLabel)
+                                .collect(Collectors.toSet());
+                        profile.setAvailableDays(dayEnums);
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException("Invalid day in availableDays list: " + e.getMessage());
+                    }
+                }
+
+                profile.setDriverLicenseNumber(dto.getDriverLicenseNumber());
+                profile.setLicenseExpiryDate(dto.getLicenseExpiryDate());
+
+                // Optional: link to partner if included
+                if (dto.getPartnerId() != null) {
+                    PartnerProfile partner = partnerProfileRepository.findByUserId(dto.getPartnerId())
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid partner ID"));
+                    profile.setPartner(partner);
+                }
+
+                riderProfileRepository.save(profile); // You must create this repository
+            }
+
             default -> throw new IllegalArgumentException("Unsupported role: " + request.getRole());
         }
 

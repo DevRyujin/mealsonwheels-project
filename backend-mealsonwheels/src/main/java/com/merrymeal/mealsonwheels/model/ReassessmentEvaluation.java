@@ -30,6 +30,10 @@ public class ReassessmentEvaluation {
     @JoinColumn(name = "member_id", nullable = false)
     private User member; // still a User with role MEMBER
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caregiver_id", nullable = false)
+    private User caregiver;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", unique = true)
     private Order order;

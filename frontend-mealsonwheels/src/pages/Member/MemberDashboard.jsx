@@ -1,8 +1,13 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
+import { getUserRole } from '../../utils/getUserRole'; // adjust the path accordingly
 
 const MemberDashboard = () => {
   const navigate = useNavigate();
+  const role = getUserRole(); // "MEMBER", "CAREGIVER", etc.
+
+  // Determine shared route prefix
+  const routePrefix = role === 'CAREGIVER' ? '/caregiver' : '/member';
 
   return (
     <div className="max-w-8xl mx-auto">
@@ -33,7 +38,7 @@ const MemberDashboard = () => {
           <h2 className="text-2xl font-semibold mb-2">View Menu</h2>
           <p className="font-medium mb-3">Browse our section of meals</p>
           <button
-            onClick={() => navigate('/member/meal-order')}
+            onClick={() => navigate(`${routePrefix}/menus`)}
             className="inline-block px-4 py-2 bg-indigo-900 text-white rounded hover:bg-indigo-800"
           >
             Browse Meals
@@ -44,7 +49,7 @@ const MemberDashboard = () => {
           <h2 className="text-2xl font-semibold mb-4">My Orders</h2>
           <p className="font-medium mb-3">View your order history</p>
           <button
-            onClick={() => navigate('/member/order')}
+            onClick={() => navigate(`${routePrefix}/history`)}
             className="inline-block px-4 py-2 bg-indigo-900 text-white rounded hover:bg-indigo-800"
           >
             View Orders

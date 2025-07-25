@@ -19,9 +19,9 @@ const validateForm = (formData, role) => {
     if (!formData.restaurantName || !formData.partnershipDuration) {
       return "Please complete all partner-related fields.";
     }
-  } else if (role === "VOLUNTEER") {
-    if (!formData.serviceType || !formData.volunteerDuration || formData.availableDays.length === 0) {
-      return "Please complete all volunteer-related fields.";
+  } else if (role === "RIDER") {
+    if (formData.availableDays.length === 0) {
+      return "Please select available days.";
     }
   }
 
@@ -29,15 +29,38 @@ const validateForm = (formData, role) => {
 };
 
 const humanReadableError = (err) => {
-  console.error("Registration error:", err); // <--- add this
-  const msg = err?.response?.data?.message;
-  if (!msg) return "Registration failed. Please try again.";
+  const rawData = err?.response?.data;
 
-  if (msg.toLowerCase().includes("email")) return "This email is already registered.";
-  if (msg.toLowerCase().includes("phone")) return "Phone number is already in use.";
-  if (msg.toLowerCase().includes("validation")) return "Please fill all required fields correctly.";
+  const msg =
+    typeof rawData === "string"
+      ? rawData
+      : rawData?.message || err.message || "Registration failed. Please try again.";
 
-  return msg;
+  const lower = msg.toLowerCase();
+
+  if (lower.includes("email")) {
+    return { message: "This email is already registered.", field: "email" };
+  }
+
+  if (lower.includes("phone")) {
+    return { message: "Phone number is already in use.", field: "phone" };
+  }
+
+  if (
+    lower.includes("validation") ||
+    lower.includes("bad request") ||
+    lower.includes("invalid")
+  ) {
+    return {
+      message: "Please fill all required fields correctly.",
+      field: "",
+    };
+  }
+
+  return {
+    message: msg,
+    field: "",
+  };
 };
 
 
@@ -61,12 +84,11 @@ const RegisterForm = () => {
     relationToMember: "",
     restaurantName: "",
     partnershipDuration: "",
-    serviceType: "",
-    volunteerDuration: "",
     availableDays: []
   });
 
   const [error, setError] = useState("");
+  const [highlightedErrorField, setHighlightedErrorField] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
@@ -74,7 +96,6 @@ const RegisterForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  {/* For Available Days */}
   const handleCheckboxChange = (e) => {
     const { name, value, checked } = e.target;
     const val = value.toUpperCase();
@@ -87,8 +108,6 @@ const RegisterForm = () => {
     });
   };
 
-
-  {/* For Dietary Restrictions */}
   const handleDietaryChange = (e) => {
     const { value, checked } = e.target;
     let updated = [...formData.dietaryRestrictions];
@@ -103,7 +122,6 @@ const RegisterForm = () => {
 
     setFormData((prev) => ({ ...prev, dietaryRestrictions: updated }));
   };
-
 
   const getLocation = () => {
     if (!navigator.geolocation) {
@@ -145,6 +163,7 @@ const RegisterForm = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setHighlightedErrorField("");
 
     const validationError = validateForm(formData, role);
     if (validationError) {
@@ -167,13 +186,12 @@ const RegisterForm = () => {
 
       if (role === "MEMBER") {
         payload.memberProfileDTO = {
-        dietaryRestrictions: formData.dietaryRestrictions, // should be an array
-        address: formData.address,
-        memberLocationLat: parseFloat(formData.latitude),
-        memberLocationLong: parseFloat(formData.longitude),
-        //caregiverId: selectedCaregiverId, // optional
-        approved: false
-      }
+          dietaryRestrictions: formData.dietaryRestrictions,
+          address: formData.address,
+          memberLocationLat: parseFloat(formData.latitude),
+          memberLocationLong: parseFloat(formData.longitude),
+          approved: false
+        };
       } else if (role === "CAREGIVER") {
         payload.caregiverProfileDTO = {
           memberNameToAssist: formData.memberName,
@@ -186,10 +204,8 @@ const RegisterForm = () => {
           companyName: formData.restaurantName,
           partnershipDuration: formData.partnershipDuration
         };
-      } else if (role === "VOLUNTEER") {
-        payload.volunteerProfileDTO = {
-          serviceType: formData.serviceType,
-          volunteerDuration: formData.volunteerDuration,
+      } else if (role === "RIDER") {
+        payload.riderProfileDTO = {
           availableDays: formData.availableDays
         };
       }
@@ -197,7 +213,17 @@ const RegisterForm = () => {
       await axiosInstance.post("/auth/register", payload);
       navigate("/register/success");
     } catch (err) {
-      setError(humanReadableError(err));
+      const { message, field } = humanReadableError(err);
+      setError(message);
+      setHighlightedErrorField(field);
+
+      if (field) {
+        const input = document.querySelector(`input[name="${field}"]`);
+        if (input) {
+          input.scrollIntoView({ behavior: "smooth", block: "center" });
+          input.focus();
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -210,9 +236,24 @@ const RegisterForm = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <input name="name" value={formData.name} onChange={handleChange} placeholder="Full Name" className={inputClass} />
-        <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" className={inputClass} />
+        
+        <input
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+          className={`${inputClass} ${highlightedErrorField === "email" ? "border-red-500" : ""}`}
+        />
+
         <input name="password" value={formData.password} onChange={handleChange} placeholder="Password" type="password" className={inputClass} />
-        <input name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className={inputClass} />
+
+        <input
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Phone"
+          className={`${inputClass} ${highlightedErrorField === "phone" ? "border-red-500" : ""}`}
+        />
 
         <div className="flex flex-col sm:flex-row gap-2">
           <input name="address" value={formData.address} onChange={handleChange} placeholder="Address" className={inputClass} />
@@ -224,7 +265,7 @@ const RegisterForm = () => {
           <option value="MEMBER">Member</option>
           <option value="CAREGIVER">Caregiver</option>
           <option value="PARTNER">Partner</option>
-          <option value="VOLUNTEER">Volunteer</option>
+          <option value="RIDER">Rider</option>
         </select>
 
         {role === "MEMBER" && (
@@ -248,8 +289,6 @@ const RegisterForm = () => {
           </div>
         )}
 
-
-
         {role === "CAREGIVER" && (
           <>
             <input type="text" name="memberName" placeholder="Member's Name" value={formData.memberName} onChange={handleChange} className={inputClass} />
@@ -263,56 +302,17 @@ const RegisterForm = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="restaurantName" className="block text-sm font-medium text-gray-700">Restaurant/Company Name</label>
-              <input
-                name="restaurantName"
-                value={formData.restaurantName}
-                onChange={handleChange}
-                placeholder="Enter your company name"
-                className={inputClass}
-              />
+              <input name="restaurantName" value={formData.restaurantName} onChange={handleChange} placeholder="Enter your company name" className={inputClass} />
             </div>
             <div>
               <label htmlFor="partnershipDuration" className="block text-sm font-medium text-gray-700">Partnership Duration</label>
-              <input
-                name="partnershipDuration"
-                value={formData.partnershipDuration}
-                onChange={handleChange}
-                type="date"
-                className={inputClass}
-              />
+              <input name="partnershipDuration" value={formData.partnershipDuration} onChange={handleChange} type="date" className={inputClass} />
             </div>
           </div>
         )}
 
-        {role === "VOLUNTEER" && (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="serviceType" className="block text-sm font-medium text-gray-700">Type of Service</label>
-            <select
-              name="serviceType"
-              value={formData.serviceType}
-              onChange={handleChange}
-              className={inputClass}
-            >
-              <option value="">Select Service</option>
-              <option value="KITCHEN">Kitchen</option>
-              <option value="DELIVERY">Delivery</option>
-              <option value="PACKAGE">Package</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="volunteerDuration" className="block text-sm font-medium text-gray-700">Volunteer Duration</label>
-            <input
-              name="volunteerDuration"
-              value={formData.volunteerDuration}
-              onChange={handleChange}
-              type="date"
-              className={inputClass}
-            />
-          </div>
-
-          {/* ✅ NEW: Available Days */}
-          <div>
+        {role === "RIDER" && (
+          <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">Available Days</label>
             <div className="flex flex-wrap gap-4 mt-1">
               {["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"].map((day) => (
@@ -330,26 +330,13 @@ const RegisterForm = () => {
               ))}
             </div>
           </div>
-        </div>
-      )}
-
-
-          
-        
+        )}
 
         <div className="flex justify-end gap-4 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="px-6 py-2 rounded-xl border border-gray-400 text-gray-700 hover:bg-gray-100 transform transition-transform active:scale-95"
-          >
+          <button type="button" onClick={() => navigate("/")} className="px-6 py-2 rounded-xl border border-gray-400 text-gray-700 hover:bg-gray-100 transform transition-transform active:scale-95">
             Cancel
           </button>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-300 to-red-600 text-white hover:brightness-110 transform transition-transform active:scale-95"
-          >
+          <button type="submit" disabled={loading} className="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-300 to-red-600 text-white hover:brightness-110 transform transition-transform active:scale-95">
             {loading ? "Registering..." : "Register"}
           </button>
         </div>

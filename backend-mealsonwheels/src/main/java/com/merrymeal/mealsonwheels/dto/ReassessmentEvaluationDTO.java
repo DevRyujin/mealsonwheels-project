@@ -28,6 +28,9 @@ public class ReassessmentEvaluationDTO {
     @NotNull(message = "Member ID is required")
     private Long memberId;
 
+    @NotNull(message = "Caregiver ID is required")
+    private Long caregiverId;
+
     // Optional: not all evaluations are tied to an order
     private Long orderId;
 

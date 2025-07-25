@@ -1,47 +1,62 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance';
+import { orderService } from '../../services/orderService';
 
 const ConfirmOrderPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    address: '',
-    phone: '',
-    caregiverName: '',
-    caregiverRelation: '',
-    menuName: '',
-    mealType: '',
-    preparedBy: '',
-    deliveredBy: '',
-    menuPlan: '',
-  });
-  const [errors, setErrors] = useState({});
+  const [pendingOrder, setPendingOrder] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validate = () => {
-    const newErrors = {};
-    for (const key in formData) {
-      if (!formData[key]) newErrors[key] = 'This field is required';
+  useEffect(() => {
+    const stored = JSON.parse(localStorage.getItem("pendingOrder"));
+    if (!stored) {
+      const fallbackRole = localStorage.getItem("userRole")?.toLowerCase(); // or use auth context
+      if (fallbackRole === "caregiver") return navigate("/caregiver/menus");
+      else return navigate("/member/menus");
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setPendingOrder(stored);
+  }, [navigate]);
+
+  if (!pendingOrder) return null;
+
+  const { user, meal, quantity } = pendingOrder;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+     if (submitting) return;
+     setSubmitting(true);
     try {
-      await axiosInstance.post('/api/orders', formData);
-      navigate('/member/currentOrder');
+      const orderPayload = {
+        ...(user.role === "MEMBER" ? { memberId: user.id } : { caregiverId: user.id }),
+        partnerId: meal.partnerId,
+        totalAmount: 0,
+        riderId: null,
+        mealIds: [meal.id],
+        meals: [
+          {
+            mealId: meal.id,
+            mealName: meal.mealName,
+            mealDesc: meal.mealDesc,
+            mealPhoto: meal.photoData,
+            mealType: meal.mealType,
+            mealDietary: meal.mealDietary,
+            mealCreatedDate: meal.mealCreatedDate,
+            quantity
+          }
+        ]
+      };
+      console.log("Meal Type sent to backend:", meal.mealType);
+
+      await orderService.placeOrder(orderPayload);
+      localStorage.removeItem("pendingOrder");
+      if (user.role === "MEMBER") {
+        navigate("/member/order-success");
+      } else if (user.role === "CAREGIVER") {
+        navigate("/caregiver/order-success");
+      }
     } catch (err) {
-      console.error('Failed to confirm order:', err);
-      alert('Failed to submit the order. Please try again.');
+      console.error("Failed to confirm order:", err);
+      alert("Failed to submit the order. Please try again.");
     }
   };
 
@@ -50,56 +65,59 @@ const ConfirmOrderPage = () => {
       <main className="flex-grow p-6">
         <h2 className="text-left text-3xl font-semibold py-6 rounded mb-4">Confirm your order here!</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {/* Meal Card Placeholder */}
-          <div className="bg-white border rounded-xl shadow overflow-hidden flex items-center justify-center p-8 text-gray-500">
-            <p className="text-center text-lg font-medium">Your selected meal will be displayed here.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+          {/* 📸 Meal Image Card */}
+          <div className="w-full flex justify-center">
+            <div className="bg-white border rounded-xl shadow overflow-hidden p-0 w-full max-w-[800px] h-[500px] flex items-center justify-center mt-3">
+              {meal?.photoData ? (
+                <img
+                  src={`data:${meal.mealPhotoType};base64,${meal.photoData}`}
+                  alt={meal.mealName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <p className="text-gray-400 text-center">No Image Available</p>
+              )}
+            </div>
           </div>
 
-          {/* Order Form */}
+
+          {/* 📋 Info Card Styled Like a Form (but Read-only) */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <fieldset className="border border-gray-300 p-4 rounded">
               <legend className="text-lg font-semibold">Your Details</legend>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {['fullName','email','address','phone','caregiverName','caregiverRelation'].map(field => (
-                  <div key={field} className="flex flex-col">
-                    <input
-                      name={field}
-                      placeholder={field.replace(/([A-Z])/g, ' $1')}
-                      className={`border p-2 rounded w-full ${errors[field] ? 'border-red-500' : ''}`}
-                      value={formData[field]}
-                      onChange={handleChange}
-                    />
-                    {errors[field] && <span className="text-red-500 text-sm mt-1">{errors[field]}</span>}
-                  </div>
-                ))}
+                <ReadOnlyField label="Full Name" value={user.name} />
+                <ReadOnlyField label="Email" value={user.email} />
+                <ReadOnlyField label="Address" value={user.address} />
+                <ReadOnlyField label="Phone" value={user.phone} />
+
+                {user.role === "CAREGIVER" && (
+                  <>
+                    <ReadOnlyField label="Caregiver Name" value={user.caregiverName || "N/A"} />
+                    <ReadOnlyField label="Relation" value={user.caregiverRelation || "N/A"} />
+                  </>
+                )}
               </div>
             </fieldset>
 
             <fieldset className="border border-gray-300 p-4 rounded">
               <legend className="text-lg font-semibold">Menu to order</legend>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                {['menuName','mealType','preparedBy','deliveredBy','menuPlan'].map(field => (
-                  <div key={field} className="flex flex-col col-span-1 md:col-span-1">
-                    <input
-                      name={field}
-                      placeholder={field.replace(/([A-Z])/g, ' $1')}
-                      className={`border p-2 rounded w-full ${errors[field] ? 'border-red-500' : ''}`}
-                      value={formData[field]}
-                      onChange={handleChange}
-                    />
-                    {errors[field] && <span className="text-red-500 text-sm mt-1">{errors[field]}</span>}
-                  </div>
-                ))}
+                <ReadOnlyField label="Menu Name" value={meal.mealName} />
+                <ReadOnlyField label="Meal Type" value={meal.mealType} />
+                <ReadOnlyField label="Quantity" value={quantity} />
+                <ReadOnlyField label="Created Date" value={meal.mealCreatedDate?.slice(0, 10)} />
               </div>
             </fieldset>
 
             <div className="text-center">
               <button
                 type="submit"
-                className="inline-block mt-4 px-6 py-2 border border-black rounded hover:bg-gray-200 transition"
+                disabled={submitting}
+                className="inline-block mt-4 px-6 py-2 border border-black rounded hover:bg-gray-200 transition disabled:opacity-50"
               >
-                Confirm Order
+                {submitting ? "Placing Order..." : "Confirm Order"}
               </button>
             </div>
           </form>
@@ -108,5 +126,12 @@ const ConfirmOrderPage = () => {
     </div>
   );
 };
+
+const ReadOnlyField = ({ label, value }) => (
+  <div className="flex flex-col">
+    <label className="text-sm text-gray-500 mb-1">{label}</label>
+    <div className="border p-2 rounded bg-gray-100 text-gray-800">{value}</div>
+  </div>
+);
 
 export default ConfirmOrderPage;

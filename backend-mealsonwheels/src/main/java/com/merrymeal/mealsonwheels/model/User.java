@@ -2,6 +2,8 @@ package com.merrymeal.mealsonwheels.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import jakarta.persistence.ElementCollection;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -26,6 +28,9 @@ public class User {
     private Double longitude;
 
     private String password;
+
+    @ElementCollection
+    private List<String> dietaryRestrictions;
 
     @Column
     private Integer age;

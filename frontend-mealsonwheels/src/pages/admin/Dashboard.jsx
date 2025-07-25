@@ -51,13 +51,18 @@ export default function Dashboard() {
   };
 
   const handleApprove = async (id) => {
-    try {
-      await axiosInstance.put(`/admin/approve-user/${id}`);
-      setUsers(prev => prev.filter(u => u.id !== id));
-    } catch (err) {
-      console.error("Error approving user:", err);
-    }
-  };
+  try {
+    await axiosInstance.put(`/admin/approve-user/${id}`);
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === id ? { ...user, approved: true } : user
+      )
+    );
+  } catch (err) {
+    console.error("Error approving user:", err);
+  }
+};
+
 
   const handleReject = async (id) => {
     try {
@@ -141,45 +146,56 @@ export default function Dashboard() {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-200 text-sm table-fixed">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+            <thead className="bg-indigo-50 text-indigo-800 uppercase text-xs font-semibold">
               <tr>
-                <th className="py-3 px-4 w-1/4 text-left">Name</th>
-                <th className="py-3 px-4 w-1/4 text-left">Email</th>
-                <th className="py-3 px-4 w-1/6 text-left">Status</th>
-                <th className="py-3 px-4 w-1/4 text-center">Actions</th>
+                <th className="py-3 px-4 text-left">Name</th>
+                <th className="py-3 px-4 text-left">Email</th>
+                <th className="py-3 px-4 text-left">Status</th>
+                <th className="py-3 px-4 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedUsers.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="py-4 px-4 text-center text-gray-500">
+                  <td colSpan="4" className="py-6 text-center text-gray-500 italic">
                     No users pending approval.
                   </td>
                 </tr>
               ) : (
                 paginatedUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-t hover:bg-gray-50 transition duration-200"
-                  >
-                    <td className="py-3 px-4">{user.name}</td>
-                    <td className="py-3 px-4">{user.email}</td>
+                  <tr key={user.id} className="border-t hover:bg-gray-50 transition duration-150">
+                    <td className="py-3 px-4 font-medium text-gray-800">{user.name}</td>
+                    <td className="py-3 px-4 text-gray-700">{user.email}</td>
                     <td className="py-3 px-4">
-                      {user.approved ? "Approved" : "Pending"}
+                      <span
+                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                          user.approved
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {user.approved ? "Approved" : "Pending"}
+                      </span>
                     </td>
-                    <td className="py-3 px-4 text-center space-x-2">
-                      <button
-                        onClick={() => handleApprove(user.id)}
-                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(user.id)}
-                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                      >
-                        Reject
-                      </button>
+                    <td className="py-3 px-4 text-center">
+                      {user.approved ? (
+                        <span className="text-green-700 text-sm font-semibold italic">Approved - No Action</span>
+                      ) : (
+                        <div className="inline-flex gap-2">
+                          <button
+                            onClick={() => handleApprove(user.id)}
+                            className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded shadow-sm"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleReject(user.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded shadow-sm"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))

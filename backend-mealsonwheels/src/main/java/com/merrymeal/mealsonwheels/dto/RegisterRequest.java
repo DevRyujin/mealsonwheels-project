@@ -35,5 +35,6 @@ public class RegisterRequest {
     private CaregiverProfileDTO caregiverProfileDTO;
     private PartnerProfileDTO partnerProfileDTO;
     private VolunteerProfileDTO volunteerProfileDTO;
+    private RiderProfileDTO riderProfileDTO;
     //private SupporterProfileDTO supporterProfileDTO; // ✅ include if applicable
 }

@@ -1,24 +1,35 @@
 package com.merrymeal.mealsonwheels.controller;
 
+import com.merrymeal.mealsonwheels.dto.order.OrderDTO;
+import com.merrymeal.mealsonwheels.dto.order.OrderSummaryDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.model.Order;
+import com.merrymeal.mealsonwheels.model.Role;
+import com.merrymeal.mealsonwheels.security.CustomUserDetails;
+import com.merrymeal.mealsonwheels.service.mealOrderService.OrderService;
 import com.merrymeal.mealsonwheels.service.roleService.MemberService;
 import com.merrymeal.mealsonwheels.service.adminService.ReassessmentEvaluationServiceImpl;
 import com.merrymeal.mealsonwheels.dto.ReassessmentEvaluationDTO;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/member")
-@PreAuthorize("hasRole('MEMBER')")
+@PreAuthorize("hasRole('MEMBER') or hasRole('CAREGIVER')")
 @RequiredArgsConstructor
 public class MemberController {
 
     private final MemberService memberService;
     private final ReassessmentEvaluationServiceImpl evaluationService;
+    private final OrderService orderService;
 
     @GetMapping("/profile")
     public ResponseEntity<MemberProfileDTO> getProfile() {
@@ -38,11 +49,4 @@ public class MemberController {
         return ResponseEntity.ok(caregiver);
     }
 
-    @PostMapping("/order-feedback/{orderId}")
-    public ResponseEntity<ReassessmentEvaluationDTO> submitOrderFeedback(
-            @PathVariable Long orderId,
-            @RequestBody ReassessmentEvaluationDTO dto) {
-        ReassessmentEvaluationDTO submitted = evaluationService.submitEvaluationForDeliveredOrder(orderId, dto);
-        return ResponseEntity.ok(submitted);
-    }
 }

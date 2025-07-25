@@ -10,19 +10,33 @@ const navItemsByRole = {
       dropdown: [
         { to: "/admin/members", label: "Member and Caregivers" },
         { to: "/admin/partners", label: "Partners" },
-        { to: "/admin/volunteers", label: "Volunteers" },
+        { to: "/admin/riders", label: "Riders" },
         { to: "/admin/feedbacks", label: "Feedbacks" },
       ],
     },
     { to: "/admin/menus", label: "Manage Menus" },
-    { to: "/admin/deliveries", label: "Manage Deliveries" },
+    { 
+      label: "Manage Deliveries",
+      dropdown: [
+        { to: "/admin/member-deliveries", label: "Member Deliveries" },
+        { to: "/admin/caregiver-deliveries", label: "Caregiver Deliveries"},
+      ],
+    },
     { to: "/admin/info", label: "Admin Info" },
   ],
   member: [
     { to: "/member/dashboard", label: "Dashboard" },
     { to: "/member/membercaregiver", label: "Caregiver" },
-    { to: "/member/order", label: "Orders" },
-    { to: "/member/meal-order", label: "Menu" },
+    { to: "/member/track-orders", label: "Track Orders" },
+    { to: "/member/menus", label: "Menu" },
+    { to: "/member/history", label: "History" },
+  ],
+  caregiver: [
+    { to: "/caregiver/dashboard", label: "Dashboard" },
+    { to: "/caregiver/member-profile", label: "Assigned Member" },
+    { to: "/caregiver/track-orders", label: "Track Orders" },
+    { to: "/caregiver/menus", label: "Menu" },
+    { to: "/caregiver/history", label: "History" },
   ],
   partner: [
     { to: "/partner/dashboard", label: "Dashboard" },
@@ -31,10 +45,15 @@ const navItemsByRole = {
   ],
   volunteer: [
     { to: "/volunteer/dashboard", label: "Dashboard" },
-    { to: "/volunteer/deliveries", label: "Deliveries" },
+    { to: "/volunteer/delivery-status1", label: "Deliveries 1" },
+    { to: "/volunteer/delivery-status2", label: "Deliveries 2" },
     { to: "/volunteer/menus", label: "Menus" },
     { to: "/volunteer/contact", label: "Contact" },
   ],
+  rider: [
+    { to: "/rider/dashboard", label: "Dashboard" },
+    { to: "/rider/delivery-status", label: "Deliveries" },
+  ]
 };
 
 export default function HeaderNavbar() {

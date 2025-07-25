@@ -26,47 +26,59 @@ const LoginForm = () => {
     }
 
     try {
-      setLoading(true);
-      const response = await axiosInstance.post("/auth/login", formData);
-      const { token, userType, name } = response.data;
+  setLoading(true);
+  const response = await axiosInstance.post("/auth/login", formData);
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userType", userType.toLowerCase());
-      localStorage.setItem("userName", name);
+  console.log("✅ Login response data:", response.data); // Debug
 
-      switch (userType) {
-        case "ROLE_ADMIN":
-          navigate("/admin/dashboard");
-          break;
-        case "ROLE_PARTNER":
-          navigate("/partner");
-          break;
-        case "ROLE_VOLUNTEER":
-          navigate("/volunteer");
-          break;
-        case "ROLE_CAREGIVER":
-          navigate("/caregiver");
-          break;
-        case "ROLE_MEMBER":
-          navigate("/member");
-          break;
-        default:
-          navigate("/");
-      }
-    } catch (err) {
-      const status = err?.response?.status;
-      const msg = err?.response?.data?.message?.toLowerCase() || "";
+  const { token, userType, name, user } = response.data;
 
-      if (status === 403 && msg.includes("not approved")) {
-        navigate("/approval-pending");
-      } else if (msg.includes("credentials")) {
-        setError("Invalid email or password.");
-      } else {
-        setError("Login failed. Please try again.");
-      }
-    } finally {
-      setLoading(false);
-    }
+  localStorage.setItem("token", token);
+  localStorage.setItem("userType", userType.toLowerCase());
+  localStorage.setItem("userName", name);
+
+  // ✅ Safely store user object
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  } else {
+    console.warn("⚠️ No user object found in response.");
+  }
+
+  switch (userType) {
+    case "ROLE_ADMIN":
+      navigate("/admin/dashboard");
+      break;
+    case "ROLE_PARTNER":
+      navigate("/partner");
+      break;
+    case "ROLE_VOLUNTEER":
+      navigate("/volunteer");
+      break;
+    case "ROLE_CAREGIVER":
+      navigate("/caregiver");
+      break;
+    case "ROLE_MEMBER":
+      navigate("/member");
+      break;
+    default:
+      navigate("/");
+  }
+} catch (err) {
+  const status = err?.response?.status;
+  const msg = err?.response?.data?.message?.toLowerCase() || "";
+
+  if (status === 403 && msg.includes("not approved")) {
+    navigate("/approval-pending");
+  } else if (msg.includes("credentials")) {
+    setError("Invalid email or password.");
+  } else {
+    console.error("❌ Login error:", err); // <--- Add this
+    setError("Login failed. Please try again.");
+  }
+} finally {
+  setLoading(false);
+}
+
   };
 
   return (

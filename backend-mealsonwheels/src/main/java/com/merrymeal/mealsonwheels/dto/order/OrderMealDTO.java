@@ -25,9 +25,11 @@ public class OrderMealDTO {
         this.mealName = meal.getMealName();
         this.mealPhoto = meal.getMealPhoto();
         this.mealDesc = meal.getMealDesc();
-        this.mealType = meal.getMealType();
+        this.mealType = meal.getMealType().name();
         this.mealDietary = meal.getMealDietary();
         this.mealCreatedDate = meal.getMealCreatedDate();
         this.quantity = quantity;
     }
+
+
 }

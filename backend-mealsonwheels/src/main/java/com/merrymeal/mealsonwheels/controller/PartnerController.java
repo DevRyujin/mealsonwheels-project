@@ -40,4 +40,23 @@ public class PartnerController {
     public ResponseEntity<List<RiderProfileDTO>> getMyRiders() {
         return ResponseEntity.ok(partnerService.getMyRiders());
     }
+
+    @DeleteMapping("/meals/{id}")
+    public ResponseEntity<Void> deleteMeal(@PathVariable Long id) {
+        partnerService.deleteMeal(id); // Implement this in the service
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/meals/{id}")
+    public ResponseEntity<MealDTO> updateMeal(@PathVariable Long id, @RequestBody MealDTO mealDTO) {
+        MealDTO updated = partnerService.updateMeal(id, mealDTO); // Implement this
+        return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/meals")
+    public ResponseEntity<MealDTO> createMeal(@RequestBody MealDTO mealDTO) {
+        MealDTO created = partnerService.createMeal(mealDTO); // You’ll create this
+        return ResponseEntity.ok(created);
+    }
+
 }

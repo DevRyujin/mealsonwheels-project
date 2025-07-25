@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../../config/api';
+import { mealService } from '../../services/mealService';
 
 export default function AddMenuPage() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
+  const [mealType, setMealType] = useState(''); // new added flow
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleImageUpload = (e) => {
@@ -21,17 +25,30 @@ export default function AddMenuPage() {
   };
 
   const handleCreateMenu = () => {
-    if (!title || !description || !image) {
-      setError("Please fill out all fields and upload an image.");
+    if (!title || !description || !image || !mealType) {
+      setError('Please fill out all fields, choose a type, and upload an image.');
       return;
     }
     setError('');
     setSubmitted(true);
   };
 
-  const handleConfirm = () => {
-    navigate('/member/meal-order');
+  const handleConfirm = async () => {
+    const payload = {
+      mealName: title,
+      mealDesc: description,
+      photoData: image,
+      mealType: mealType
+    };
+    try {
+      await mealService.createMeal(payload);
+      navigate('/partner/dashboard');
+    } catch (err) {
+      console.error("❌ Meal creation failed:", err.response?.data || err.message);
+      setError("Failed to create menu. Please try again.");
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-between px-8 py-10">
@@ -41,11 +58,23 @@ export default function AddMenuPage() {
             <img src={image} alt="Menu Preview" className="w-full h-64 object-cover rounded-md border" />
             <h1 className="text-2xl font-bold text-gray-800">{title}</h1>
             <p className="text-gray-600 text-sm">{description}</p>
+
+            {error && <p className="text-red-500">{error}</p>}
+
             <button
               onClick={handleConfirm}
+              disabled={loading}
               className="w-full bg-gradient-to-r from-orange-300 to-red-600 text-white font-semibold py-2 rounded hover:brightness-90 transform transition-transform active:scale-95"
             >
-              Confirm 
+              {loading ? 'Saving...' : 'Confirm'}
+            </button>
+
+            <button
+              onClick={() => setSubmitted(false)}
+              disabled={loading}
+              className="mt-2 w-full border py-2 rounded hover:bg-gray-200"
+            >
+              Edit
             </button>
           </div>
         </div>
@@ -55,7 +84,7 @@ export default function AddMenuPage() {
             {image ? (
               <img src={image} alt="Menu Preview" className="max-h-64 rounded object-contain" />
             ) : (
-              "Create your ideal menu with us!"
+              'Create your ideal menu with us!'
             )}
           </div>
 
@@ -90,6 +119,19 @@ export default function AddMenuPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               ></textarea>
+            </div>
+
+            <div>
+              <label className="block mb-1 font-semibold">Meal Type</label>
+              <select
+                className="w-full border rounded px-3 py-2"
+                value={mealType}
+                onChange={(e) => setMealType(e.target.value)}
+              >
+                <option value="">Select type</option>
+                <option value="HOT">Hot Meal</option>
+                <option value="FROZEN">Frozen Meal</option>
+              </select>
             </div>
 
             <button

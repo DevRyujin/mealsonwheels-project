@@ -4,12 +4,13 @@ export const authService = {
   login: async (credentials) => {
     try {
       const response = await api.post('/api/auth/login', credentials);
-      const { token, userType } = response.data;
-      
-      // Store token and user info
+      const { token, userType, user } = response.data;
+
+      // ✅ Store token and full user object
       localStorage.setItem('token', token);
       localStorage.setItem('userType', userType);
-      
+      localStorage.setItem('user', JSON.stringify(user));  // ✅ important line
+
       return response.data;
     } catch (error) {
       console.error('Login error:', error);

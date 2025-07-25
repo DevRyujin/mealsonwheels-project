@@ -15,6 +15,7 @@ import java.util.List;
 @SuperBuilder
 public class CaregiverProfileDTO {
 
+    private String id;
     private String caregiverName;
     private String caregiverEmail;
     private String caregiverPhone;

@@ -1,17 +1,35 @@
 import React, { useState } from 'react';
 import { FaStar } from 'react-icons/fa';
+import { useNavigate, useParams } from 'react-router-dom';
+import { mealService } from '../../services/mealService';
 
 export default function MemberFeedback() {
   const [rating, setRating] = useState(0);
   const [comments, setComments] = useState('');
+  const navigate = useNavigate();
+  const { orderId } = useParams(); // ✅ Get the order ID from the route
+  const user = JSON.parse(localStorage.getItem('user'));
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!rating) {
       alert('Please select a star rating!');
       return;
     }
-    console.log({ rating, comments });
-    alert(`Thanks for your ${rating}-star feedback!`);
+
+    try {
+      await mealService.rateMeal(orderId, { rating, comments }); // Send rating + comment
+      alert(`Thanks for your ${rating}-star feedback!`);
+      if (user.role === 'MEMBER') {
+        navigate('/member/dashboard');
+      } else if (user.role === 'CAREGIVER') {
+        navigate('/caregiver/dashboard');
+      }
+      
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+      alert('Something went wrong while submitting your feedback.');
+    }
+
     setRating(0);
     setComments('');
   };
@@ -19,7 +37,6 @@ export default function MemberFeedback() {
   return (
     <div className="bg-white min-h-screen px-4 py-10 md:px-16">
       <div className="max-w-3xl mx-auto">
-        {/* Header */}
         <div className="bg-gray-100 p-6 rounded text-center shadow mb-10">
           <h1 className="text-3xl font-bold text-gray-800">Got feedback? We're listening!</h1>
           <p className="text-gray-600 mt-2">Every thought counts—be a part of our evolution.</p>
@@ -29,7 +46,7 @@ export default function MemberFeedback() {
           Let us know how we did — your input matters
         </p>
 
-        {/* Grouped Star Ratings */}
+        {/* Star Rating */}
         <div className="flex flex-wrap gap-16 mb-6">
           {[1, 2, 3, 4, 5].map((group) => (
             <button
@@ -50,7 +67,6 @@ export default function MemberFeedback() {
           ))}
         </div>
 
-        {/* Comment Input */}
         <label htmlFor="comments" className="block font-semibold text-gray-700 mb-1">
           Your comments
         </label>
@@ -63,7 +79,6 @@ export default function MemberFeedback() {
           className="w-full border-b border-gray-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 py-2 px-1 mb-6"
         />
 
-        {/* Submit Buttons */}
         <div className="flex items-center justify-between">
           <button
             onClick={handleSubmit}
@@ -72,8 +87,8 @@ export default function MemberFeedback() {
             Submit Feedback
           </button>
           <button 
-          className="text-sm text-blue-600 hover:underline"
-          onClick={() => navigate('/member/memberdashboard')}
+            className="text-sm text-blue-600 hover:underline"
+            onClick={() => navigate('/member/dashboard')}
           >
             Maybe Later
           </button>

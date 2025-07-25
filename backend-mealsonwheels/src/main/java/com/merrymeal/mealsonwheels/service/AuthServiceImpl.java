@@ -3,6 +3,7 @@ package com.merrymeal.mealsonwheels.service;
 import com.merrymeal.mealsonwheels.dto.*;
 import com.merrymeal.mealsonwheels.exception.AccountNotApprovedException;
 import com.merrymeal.mealsonwheels.model.User;
+import com.merrymeal.mealsonwheels.dto.UserDTO;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import com.merrymeal.mealsonwheels.security.CustomUserDetails;
 import com.merrymeal.mealsonwheels.security.JwtTokenProvider;
@@ -43,32 +44,23 @@ public class AuthServiceImpl implements AuthService {
             throw new AccountNotApprovedException("Your account has not been approved yet by the admin.");
         }
 
-
-
-
-        /*
-        // Debug code
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
-                            loginRequest.getPassword()
-                    )
-            );
-        } catch (AuthenticationException e) {
-            throw new RuntimeException("Authentication failed: " + e.getMessage());
-        }*/
-
-
-        /*authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        ); */
-
         User user = userRepository.findByEmail(loginRequest.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        UserDTO userDTO = UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .age(user.getAge())
+                .address(user.getAddress())
+                .latitude(user.getLatitude())
+                .longitude(user.getLongitude())
+                .role(user.getRole())
+                .approved(user.isApproved())
+                .dietaryRestrictions(user.getDietaryRestrictions()) // if not null
+                .build();
+
 
         // ✅ Approval check
         if (!user.isApproved()) {
@@ -85,7 +77,14 @@ public class AuthServiceImpl implements AuthService {
         response.setUserId(user.getId());
         response.setEmail(user.getEmail());
         response.setMessage("Login successful");
-        response.setName(user.getName()); // Full name from user entity
+        response.setName(user.getName());
+        response.setUser(userDTO); // ✅ include full user details here
+
+        System.out.println("🔍 AuthResponse contents:");
+        System.out.println("Token: " + response.getToken());
+        System.out.println("User ID: " + response.getUserId());
+        System.out.println("User: " + response.getUser());  // this is most important
+
 
         return response;
     }

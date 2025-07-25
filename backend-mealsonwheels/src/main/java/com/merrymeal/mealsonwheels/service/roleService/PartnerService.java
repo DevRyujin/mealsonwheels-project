@@ -12,4 +12,8 @@ public interface PartnerService {
     List<DishDTO> getMyDishes();
     List<MenuDTO> getMyMenus();
     List<RiderProfileDTO> getMyRiders();
+
+    MealDTO createMeal(MealDTO mealDTO);
+    void deleteMeal(Long id);
+    MealDTO updateMeal(Long id, MealDTO mealDTO);
 }

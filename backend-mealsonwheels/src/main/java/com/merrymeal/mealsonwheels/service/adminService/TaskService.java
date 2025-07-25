@@ -10,4 +10,5 @@ public interface TaskService {
     void deleteTask(Long id);
     List<TaskDTO> getAllTasks();
     List<TaskDTO> getTasksByVolunteerId(Long volunteerId);
+    List<TaskDTO> getTasksByRiderId(Long riderId);
 }

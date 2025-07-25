@@ -8,13 +8,16 @@ import java.util.Optional;
 
 public interface MemberProfileRepository extends JpaRepository<MemberProfile, Long> {
 
-    Optional<MemberProfile> findByUser_Email(String email);                // ✅ useful for login/validation
+    Optional<MemberProfile> findByUser_Email(String email);                //  useful for login/validation
+    Optional<MemberProfile> findByUserId(Long userId);
 
-    Optional<MemberProfile> findByUser_Name(String name); // if name is used instead of username         // ✅ admin/user dashboard
+    Optional<MemberProfile> findByUser_Name(String name); // if name is used instead of username         //  admin/user dashboard
 
-    List<MemberProfile> findByApprovedFalse();                         // ✅ admin approval list
+    List<MemberProfile> findByApprovedFalse();                         //  admin approval list
 
-    List<MemberProfile> findByApprovedTrue();                          // ✅ admin stats or display
+    List<MemberProfile> findByApprovedTrue();                          //  admin stats or display
 
-    List<MemberProfile> findByCaregiverId(Long caregiverId);          // ✅ used for caregiver-member mapping
+    List<MemberProfile> findByCaregiverId(Long caregiverId);          //  used for caregiver-member mapping
+
+
 }

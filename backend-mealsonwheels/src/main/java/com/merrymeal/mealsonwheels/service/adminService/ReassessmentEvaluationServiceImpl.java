@@ -41,6 +41,10 @@ public class ReassessmentEvaluationServiceImpl implements ReassessmentEvaluation
         return evaluationRepository.findByMemberId(memberId);
     }
 
+    public List<ReassessmentEvaluation> getEvaluationsByCaregiverId(Long caregiverId) {
+        return evaluationRepository.findByCaregiverId(caregiverId);
+    }
+
     @Override
     public List<ReassessmentEvaluation> getAllEvaluations() {
         return evaluationRepository.findAll();
@@ -55,6 +59,7 @@ public class ReassessmentEvaluationServiceImpl implements ReassessmentEvaluation
         evaluation.setEvaluationNotes(evaluationDetails.getEvaluationNotes());
         evaluation.setServiceAdjustments(evaluationDetails.getServiceAdjustments());
         evaluation.setMember(evaluationDetails.getMember());
+        evaluation.setCaregiver(evaluation.getCaregiver());
         evaluation.setOrder(evaluationDetails.getOrder());
         evaluation.setRating(evaluationDetails.getRating());
         evaluation.setComment(evaluationDetails.getComment());
@@ -72,7 +77,7 @@ public class ReassessmentEvaluationServiceImpl implements ReassessmentEvaluation
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        if (!"DELIVERED".equalsIgnoreCase(order.getStatus())) {
+        if (order.getStatus() != TaskStatus.COMPLETED) {
             throw new IllegalStateException("Order must be delivered to submit evaluation.");
         }
 
@@ -80,15 +85,16 @@ public class ReassessmentEvaluationServiceImpl implements ReassessmentEvaluation
             throw new IllegalStateException("Evaluation for this order already exists.");
         }
 
-        User memberUser = userRepository.findById(SecurityUtil.getCurrentUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("Member not found"));
+        User user = userRepository.findById(SecurityUtil.getCurrentUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("Member or Caregiver not found"));
 
         ReassessmentEvaluation evaluation = ReassessmentEvaluation.builder()
                 .evaluationDate(LocalDateTime.now())
                 .rating(dto.getRating())
                 .comment(dto.getComment())
                 .order(order)
-                .member(memberUser) // ✅ this is correct
+                .member(user)
+                .caregiver(user)
                 .build();
 
         evaluationRepository.save(evaluation);
@@ -99,7 +105,8 @@ public class ReassessmentEvaluationServiceImpl implements ReassessmentEvaluation
                 .comment(evaluation.getComment())
                 .rating(evaluation.getRating())
                 .orderId(order.getId())
-                .memberId(memberUser.getId()) // ✅ this is also correct
+                .memberId(user.getId())
+                .caregiverId(user.getId())
                 .build();
 
     }

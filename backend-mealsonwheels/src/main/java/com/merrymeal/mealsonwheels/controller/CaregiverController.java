@@ -1,10 +1,19 @@
 package com.merrymeal.mealsonwheels.controller;
 
+import com.merrymeal.mealsonwheels.dto.order.OrderDTO;
+import com.merrymeal.mealsonwheels.dto.order.OrderRequestDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
+import com.merrymeal.mealsonwheels.repository.CaregiverProfileRepository;
+import com.merrymeal.mealsonwheels.repository.MemberProfileRepository;
+import com.merrymeal.mealsonwheels.repository.PartnerProfileRepository;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
 import com.merrymeal.mealsonwheels.service.roleService.CaregiverService;
 
+import com.merrymeal.mealsonwheels.service.roleService.MemberService;
+import com.merrymeal.mealsonwheels.util.DistanceUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +26,20 @@ import java.util.List;
 public class CaregiverController {
 
     private final CaregiverService caregiverService;
+    private final MemberService memberService;
 
-    public CaregiverController(CaregiverService caregiverService) {
+    @Autowired
+    private CaregiverProfileRepository caregiverProfileRepository;
+
+    @Autowired
+    private MemberProfileRepository memberProfileRepository;
+
+    @Autowired
+    private PartnerProfileRepository partnerProfileRepository;
+
+    public CaregiverController(CaregiverService caregiverService, MemberService memberService) {
         this.caregiverService = caregiverService;
+        this.memberService = memberService;
     }
 
     @GetMapping("/profile")
@@ -44,4 +64,5 @@ public class CaregiverController {
     public MemberProfileDTO assignMemberToSelf(@PathVariable Long memberId) {
         return caregiverService.assignMemberToCurrentCaregiver(memberId);
     }
+
 }

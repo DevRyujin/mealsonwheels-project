@@ -27,8 +27,10 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public List<MealDTO> getMyMeals() {
         PartnerProfile partner = getCurrentPartner();
-        return mealRepository.findByPartnerId(partner.getId())
-                .stream().map(this::mapToMealDTO).collect(Collectors.toList());
+        return mealRepository.findByPartnerId(partner.getUser().getId())
+                .stream()
+                .map(this::mapToMealDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -49,14 +51,7 @@ public class PartnerServiceImpl implements PartnerService {
     public List<RiderProfileDTO> getMyRiders() {
         PartnerProfile partner = getCurrentPartner();
         return partner.getRiders().stream()
-                .map(r -> RiderProfileDTO.builder()
-                        .id(r.getId())
-                        .username(r.getUser().getName())
-                        .email(r.getUser().getEmail())
-                        .phoneNumber(r.getUser().getPhone())
-                        .driverLicenseNumber(r.getDriverLicenseNumber())
-                        .partnerId(partner.getId())
-                        .build())
+                .map(this::toRiderProfileDTO)
                 .collect(Collectors.toList());
     }
 
@@ -78,14 +73,18 @@ public class PartnerServiceImpl implements PartnerService {
                 .id(meal.getId())
                 .mealName(meal.getMealName())
                 .mealDesc(meal.getMealDesc())
-                .mealDietary(meal.getMealDietary())
                 .mealType(meal.getMealType())
-                .mealPhoto(meal.getMealPhoto())
+                .mealDietary(meal.getMealDietary())
                 .mealCreatedDate(meal.getMealCreatedDate())
                 .partnerId(meal.getPartner() != null ? meal.getPartner().getId() : null)
                 .menuId(meal.getMenu() != null ? meal.getMenu().getId() : null)
+                .mealPhotoType(meal.getMealPhotoType())
+                .photoData(meal.getMealPhoto() != null
+                        ? java.util.Base64.getEncoder().encodeToString(meal.getMealPhoto())
+                        : null)
                 .build();
     }
+
 
     private DishDTO mapToDishDTO(Dish dish) {
         return DishDTO.builder()
@@ -115,6 +114,83 @@ public class PartnerServiceImpl implements PartnerService {
                 .partnerId(menu.getPartner() != null ? menu.getPartner().getId() : null)
                 .build();
     }
+
+    @Override
+    public MealDTO createMeal(MealDTO mealDTO) {
+        PartnerProfile partner = getCurrentPartner();
+
+        Meal meal = new Meal();
+        meal.setMealName(mealDTO.getMealName());
+        meal.setMealDesc(mealDTO.getMealDesc());
+        meal.setMealType(mealDTO.getMealType());
+        meal.setMealDietary(mealDTO.getMealDietary());
+        meal.setMealCreatedDate(java.time.LocalDateTime.now());
+        meal.setPartner(partner.getUser());
+
+        // Handle photo (Base64 string to byte[] if needed)
+        if (mealDTO.getPhotoData() != null) {
+            String base64Data = mealDTO.getPhotoData();
+            byte[] imageData = java.util.Base64.getDecoder().decode(base64Data.split(",")[1]);
+            meal.setMealPhoto(imageData);
+            meal.setMealPhotoType(base64Data.split(",")[0].split(":")[1].split(";")[0]); // Extract MIME type
+        }
+
+        Meal saved = mealRepository.save(meal);
+        return mapToMealDTO(saved);
+    }
+
+    @Override
+    public void deleteMeal(Long id) {
+        PartnerProfile partner = getCurrentPartner();
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Meal not found with ID: " + id));
+        // Check ownership
+        if (!meal.getPartner().getId().equals(partner.getUser().getId())) {
+            throw new RuntimeException("Not authorized to delete this meal");
+        }
+        mealRepository.delete(meal);
+    }
+
+    @Override
+    public MealDTO updateMeal(Long id, MealDTO mealDTO) {
+        PartnerProfile partner = getCurrentPartner();
+        Meal meal = mealRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Meal not found with ID: " + id));
+        // Check ownership
+        if (!meal.getPartner().getId().equals(partner.getUser().getId())) {
+            throw new RuntimeException("Not authorized to update this meal");
+        }
+
+        meal.setMealName(mealDTO.getMealName());
+        meal.setMealDesc(mealDTO.getMealDesc());
+        meal.setMealType(mealDTO.getMealType());
+        meal.setMealDietary(mealDTO.getMealDietary());
+
+        if (mealDTO.getPhotoData() != null) {
+            byte[] imageData = java.util.Base64.getDecoder().decode(mealDTO.getPhotoData().split(",")[1]);
+            meal.setMealPhoto(imageData);
+        }
+
+        Meal updatedMeal = mealRepository.save(meal);
+        return mapToMealDTO(updatedMeal);
+    }
+
+    private RiderProfileDTO toRiderProfileDTO(RiderProfile rider) {
+        return RiderProfileDTO.builder()
+                .id(rider.getId())
+                .name(rider.getUser().getName())
+                .email(rider.getUser().getEmail())
+                .phone(rider.getUser().getPhone())
+                .approved(rider.getUser().isApproved())
+                .driverLicenseNumber(rider.getDriverLicenseNumber())
+                .licenseExpiryDate(rider.getLicenseExpiryDate())
+                .partnerId(rider.getPartner() != null ? rider.getPartner().getId() : null)
+                .partnerCompanyName(rider.getPartner() != null ? rider.getPartner().getCompanyName() : null)
+                .build();
+    }
+
+
+
 
 
 }

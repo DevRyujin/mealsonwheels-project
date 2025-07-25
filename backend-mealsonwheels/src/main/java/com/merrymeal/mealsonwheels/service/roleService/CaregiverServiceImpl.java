@@ -1,19 +1,26 @@
 package com.merrymeal.mealsonwheels.service.roleService;
 
+import com.merrymeal.mealsonwheels.dto.order.OrderMealDTO;
+import com.merrymeal.mealsonwheels.dto.order.OrderRequestDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
-import com.merrymeal.mealsonwheels.model.CaregiverProfile;
-import com.merrymeal.mealsonwheels.model.MemberProfile;
-import com.merrymeal.mealsonwheels.model.Role;
-import com.merrymeal.mealsonwheels.model.User;
-import com.merrymeal.mealsonwheels.repository.UserRepository;
+import com.merrymeal.mealsonwheels.exception.ResourceNotFoundException;
+import com.merrymeal.mealsonwheels.model.*;
+import com.merrymeal.mealsonwheels.repository.*;
 import com.merrymeal.mealsonwheels.security.SecurityUtil;
+import com.merrymeal.mealsonwheels.util.DistanceUtil;
 import com.merrymeal.mealsonwheels.util.UserValidationUtil;
+import com.merrymeal.mealsonwheels.dto.order.OrderDTO;
+
+import java.time.LocalDateTime;
+
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +29,24 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CaregiverServiceImpl implements CaregiverService {
 
-    private final UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private MealRepository mealRepository;
+
+    @Autowired
+    private CaregiverProfileRepository caregiverProfileRepository;
+
+    @Autowired
+    private PartnerProfileRepository partnerProfileRepository;
+
+    @Autowired
+    private RiderProfileRepository riderProfileRepository;
+
 
     @Override
     public CaregiverProfileDTO getCurrentCaregiverProfile(Long caregiverId) {
@@ -136,6 +160,5 @@ public class CaregiverServiceImpl implements CaregiverService {
                 .caregiverPhone(caregiverUser != null ? caregiverUser.getPhone() : null)
                 .build();
     }
-
 
 }

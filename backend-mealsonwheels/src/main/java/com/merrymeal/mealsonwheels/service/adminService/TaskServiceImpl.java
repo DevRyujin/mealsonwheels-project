@@ -6,6 +6,7 @@ import com.merrymeal.mealsonwheels.model.Task;
 import com.merrymeal.mealsonwheels.model.TaskStatus;
 import com.merrymeal.mealsonwheels.model.User;
 import com.merrymeal.mealsonwheels.model.VolunteerProfile;
+import com.merrymeal.mealsonwheels.model.RiderProfile;
 import com.merrymeal.mealsonwheels.repository.TaskRepository;
 import com.merrymeal.mealsonwheels.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -87,6 +88,15 @@ public class TaskServiceImpl implements TaskService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<TaskDTO> getTasksByRiderId(Long riderId) {
+        User rider = userRepository.findById(riderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rider not found with id " + riderId));
+        return taskRepository.findByRider(rider).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     private TaskDTO convertToDTO(Task task) {
         return TaskDTO.builder()
@@ -96,6 +106,8 @@ public class TaskServiceImpl implements TaskService {
                 .statusLabel(task.getStatus().getLabel())      // For frontend dropdown display
                 .volunteerId(task.getVolunteer().getId())
                 .volunteerName(task.getVolunteer().getName())
+                .riderId(task.getRider().getId())
+                .riderName(task.getRider().getName())
                 .build();
     }
 

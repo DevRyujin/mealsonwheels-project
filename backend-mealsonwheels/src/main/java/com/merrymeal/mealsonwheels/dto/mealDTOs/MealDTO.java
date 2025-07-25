@@ -1,5 +1,6 @@
 package com.merrymeal.mealsonwheels.dto.mealDTOs;
 
+import com.merrymeal.mealsonwheels.model.MealType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,7 +19,9 @@ public class MealDTO {
     @Size(max = 100)
     private String mealName;
 
-    private byte[] mealPhoto;
+    private byte[] mealPhoto; // used internally
+    private String photoData; // used for upload
+    private String mealPhotoType; // MIME type e.g., "image/png"
 
     @Size(max = 500)
     private String mealDesc;
@@ -26,11 +29,14 @@ public class MealDTO {
     private Long partnerId;
     private Long menuId;
 
-    @Size(max = 50)
-    private String mealType;
+    private MealType mealType;
 
     @Size(max = 50)
     private String mealDietary;
 
     private LocalDateTime mealCreatedDate;
+
+    private Double partnerLatitude;
+    private Double partnerLongitude;
+
 }

@@ -14,6 +14,8 @@ public interface ReassessmentEvaluationService {
 
     List<ReassessmentEvaluation> getEvaluationsByMemberId(Long memberId);
 
+    List<ReassessmentEvaluation> getEvaluationsByCaregiverId(Long caregiverId);
+
     List<ReassessmentEvaluation> getAllEvaluations();
 
     ReassessmentEvaluation updateEvaluation(Long id, ReassessmentEvaluation evaluationDetails);

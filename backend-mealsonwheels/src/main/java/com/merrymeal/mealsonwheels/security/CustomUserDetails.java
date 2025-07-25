@@ -1,5 +1,6 @@
 package com.merrymeal.mealsonwheels.security;
 
+import com.merrymeal.mealsonwheels.model.Role;
 import com.merrymeal.mealsonwheels.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -64,4 +65,10 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return user.isApproved();
     }
+
+    public Role getRole() {
+        return user.getRole();
+    }
+
+
 }

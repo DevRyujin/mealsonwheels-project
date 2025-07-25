@@ -1,6 +1,8 @@
 package com.merrymeal.mealsonwheels.service.roleService;
 
 
+import com.merrymeal.mealsonwheels.dto.order.OrderDTO;
+import com.merrymeal.mealsonwheels.dto.order.OrderRequestDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
 import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
 
@@ -15,4 +17,9 @@ public interface CaregiverService {
     List<MemberProfileDTO> getMembersUnderCare(Long caregiverId);
 
     MemberProfileDTO assignMemberToCurrentCaregiver(Long memberId);
+
+    //void placeOrderForCaregiver(OrderRequestDTO dto);
+
+    //void placeOrderForCaregiver(Long caregiverId, OrderDTO orderDTO);
+
 }

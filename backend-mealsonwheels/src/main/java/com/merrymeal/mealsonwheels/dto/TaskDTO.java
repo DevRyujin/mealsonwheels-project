@@ -25,4 +25,7 @@ public class TaskDTO {
 
     private Long volunteerId;
     private String volunteerName;
+
+    private Long riderId;
+    private String riderName;
 }

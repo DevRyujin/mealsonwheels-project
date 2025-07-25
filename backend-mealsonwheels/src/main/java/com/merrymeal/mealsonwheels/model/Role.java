@@ -8,5 +8,6 @@ public enum Role {
     ADMIN,
     DONOR,
     RIDER,
-    SUPPORTER
+    SUPPORTER,
+    UNASSIGNED
 }

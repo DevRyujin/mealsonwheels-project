@@ -22,8 +22,10 @@ public class Order {
 
     private Double totalAmount;
 
-    private String orderType; // e.g., "Delivery", "Pickup"
-    private String status;    // e.g., "Pending", "Delivered", "Cancelled"
+    private String orderType;
+
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -36,6 +38,10 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rider_id")
     private RiderProfile rider;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "caregiver_id")
+    private CaregiverProfile caregiver;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
@@ -52,4 +58,26 @@ public class Order {
         orderMeals.add(om);
         om.setOrder(this);
     }
+
+    @Column(name = "start_delivery_time")
+    private LocalDateTime startDeliveryTime;
+
+    @Column(name = "end_delivery_time")
+    private LocalDateTime endDeliveryTime;
+
+    @Column(name = "code")
+    private String code;
+
+    @Column(name = "actual_meal_type")
+    private String actualMealType; // Hot or Frozen, based on distance
+
+    @Column(name = "distance_km")
+    private Double distanceKm;
+
+    // for caregiver
+    private String recipientName;
+    private String deliveryAddress;
+
+
+
 }

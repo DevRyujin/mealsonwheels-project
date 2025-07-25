@@ -1,10 +1,7 @@
 package com.merrymeal.mealsonwheels.service.adminService;
 
 import com.merrymeal.mealsonwheels.dto.*;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.*;
 import com.merrymeal.mealsonwheels.model.*;
 import com.merrymeal.mealsonwheels.repository.*;
 
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +33,9 @@ public class AdminService {
         private OrderRepository orderRepository;
 
         @Autowired
+        private RiderProfileRepository riderProfileRepository;
+
+        @Autowired
         private DonorProfileRepository donorRepository;
 
         @Autowired
@@ -52,7 +53,13 @@ public class AdminService {
         @Autowired
         private VolunteerProfileRepository volunteerProfileRepository;
 
-        // ✅ Approve user registration
+        @Autowired
+        private TaskRepository taskRepository;
+
+        @Autowired
+        private MemberProfileRepository memberProfileRepository;
+
+        // Approve user registration
         public void approveUser(Long userId) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found"));
@@ -60,7 +67,7 @@ public class AdminService {
                 userRepository.save(user);
         }
 
-        // ✅ Reject user registration
+        // Reject user registration
         public void rejectUser(Long userId) {
                 if (!userRepository.existsById(userId)) {
                         throw new RuntimeException("User not found");
@@ -68,7 +75,7 @@ public class AdminService {
                 userRepository.deleteById(userId);
         }
 
-        // ✅ Get users by role
+        // Get users by role
         public List<UserDTO> getUsersByRole(String roleName) {
                 Role roleEnum;
                 try {
@@ -104,13 +111,13 @@ public class AdminService {
                         .address(address)
                         .latitude(lat)
                         .longitude(lng)
-                        .role(user.getRole())
+                        .role(user.getRole() != null ? user.getRole() : Role.UNASSIGNED)
                         .approved(user.isApproved())
                         .dietaryRestrictions(dietaryRestrictions)
                         .build();
         }
 
-        // ✅ Admin statistics
+        // Admin statistics
         public AdminStatisticDTO getAdminStatistics() {
                 long totalMembers = userRepository.countByRole(Role.MEMBER);
                 long totalPartners = userRepository.countByRole(Role.PARTNER);
@@ -118,7 +125,7 @@ public class AdminService {
                 long totalRiders = userRepository.countByRole(Role.RIDER);
                 long totalDonors = userRepository.countByRole(Role.DONOR);
 
-                List<Order> completedOrders = orderRepository.findByStatus("Completed");
+                List<Order> completedOrders = orderRepository.findByStatus(TaskStatus.COMPLETED);
                 long ordersDelivered = completedOrders.size();
 
                 long mealsServed = completedOrders.stream()
@@ -143,22 +150,29 @@ public class AdminService {
                         .build();
         }
 
-        // ✅ Assign task to user
+        // Assign task to user
         public void assignTaskToUser(Long userId, String taskDescription) {
                 User user = userRepository.findById(userId)
                         .orElseThrow(() -> new RuntimeException("User not found"));
 
-                TaskDTO taskDTO = TaskDTO.builder()
-                        .description(taskDescription)
-                        .status("PENDING")
-                        .volunteerId(user.getId())
-                        .volunteerName(user.getName())
-                        .build();
+                String role = user.getRole().name(); // "RIDER", "VOLUNTEER", etc.
 
-                taskService.createTask(taskDTO);
+                Task.TaskBuilder taskBuilder = Task.builder()
+                        .description(taskDescription)
+                        .status(TaskStatus.PENDING)
+                        .assignedDate(LocalDateTime.now());
+
+                switch (role) {
+                        case "RIDER" -> taskBuilder.rider(user);
+                        case "VOLUNTEER" -> taskBuilder.volunteer(user);
+                        default -> throw new IllegalArgumentException("Only RIDER or VOLUNTEER can be assigned tasks");
+                }
+
+                taskRepository.save(taskBuilder.build());
         }
 
-        // ✅ Get approved members
+
+        // Get approved members
         public List<UserDTO> getAllApprovedMembers() {
                 return userRepository.findByRole(Role.MEMBER).stream()
                         .filter(User::isApproved)
@@ -328,7 +342,7 @@ public class AdminService {
                         .companyLocationLat(profile.getCompanyLocationLat())
                         .companyLocationLong(profile.getCompanyLocationLong())
 
-                        // ✅ Add these from the associated User
+                        // Add these from the associated User
                         .email(profile.getUser() != null ? profile.getUser().getEmail() : null)
                         .address(profile.getUser() != null ? profile.getUser().getAddress() : null)
 
@@ -366,7 +380,6 @@ public class AdminService {
                         .phone(volunteer.getUser() != null ? volunteer.getUser().getPhone() : null)
                         .build();
         }
-
 
         public List<VolunteerProfileDTO> getApprovedVolunteers() {
                 return volunteerProfileRepository.findAll().stream()
@@ -425,6 +438,37 @@ public class AdminService {
                         .role(user.getRole())
                         .approved(user.isApproved())
                         .build();
+        }
+
+        public void assignRiderToOrder(Long orderId, Long riderId) {
+                Order order = orderRepository.findById(orderId)
+                        .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
+                RiderProfile rider = riderProfileRepository.findById(riderId)
+                        .orElseThrow(() -> new RuntimeException("Rider not found with ID: " + riderId));
+
+                order.setRider(rider);
+                order.setStatus(TaskStatus.ASSIGNED); // ✅ This is the key line
+                order.setStartDeliveryTime(LocalDateTime.now()); // Optional
+                orderRepository.save(order);
+        }
+
+
+        public void assignTaskToRider(Long memberUserId, Long riderId) {
+                MemberProfile member = memberProfileRepository.findByUserId(memberUserId)
+                        .orElseThrow(() -> new RuntimeException("Member not found"));
+
+                Order order = orderRepository.findTopByMemberOrderByCreatedAtDesc(member)
+                        .orElseThrow(() -> new RuntimeException("No order found for this member"));
+
+                RiderProfile rider = riderProfileRepository.findById(riderId)
+                        .orElseThrow(() -> new RuntimeException("Rider not found"));
+
+                order.setRider(rider);
+                order.setStatus(TaskStatus.ASSIGNED);
+                order.setStartDeliveryTime(LocalDateTime.now());
+
+                orderRepository.save(order);
         }
 
 

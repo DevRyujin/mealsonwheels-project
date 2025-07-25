@@ -12,6 +12,8 @@ public interface ReassessmentEvaluationRepository extends JpaRepository<Reassess
 
     List<ReassessmentEvaluation> findByMemberId(Long memberId);
 
+    List<ReassessmentEvaluation> findByCaregiverId(Long caregiverId);
+
     Optional<ReassessmentEvaluation> findByOrderId(Long orderId);
 }
 

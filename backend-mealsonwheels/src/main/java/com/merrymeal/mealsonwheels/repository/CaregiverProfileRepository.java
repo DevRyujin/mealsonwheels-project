@@ -15,4 +15,6 @@ public interface CaregiverProfileRepository extends JpaRepository<CaregiverProfi
     List<CaregiverProfile> findByApprovedFalse();                     // ✅ pending caregivers
 
     List<CaregiverProfile> findByApprovedTrue();                      // ✅ approved caregivers
+
+    Optional<CaregiverProfile> findByUserId(Long userId);
 }

@@ -31,4 +31,8 @@ public class Task {
     @JoinColumn(name = "volunteer_id")
     private User volunteer;
 
+    @ManyToOne
+    @JoinColumn(name = "rider_id")
+    private User rider;
+
 }

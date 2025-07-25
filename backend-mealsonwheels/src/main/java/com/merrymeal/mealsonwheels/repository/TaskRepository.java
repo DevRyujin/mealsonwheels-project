@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
 
-    List<Task> findByVolunteer(User volunteer); // ✅ Correct
+    List<Task> findByVolunteer(User volunteer);
+    List<Task> findByRider(User rider);// ✅ Correct
 }

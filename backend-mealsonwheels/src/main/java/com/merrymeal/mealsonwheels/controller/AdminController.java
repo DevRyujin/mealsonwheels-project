@@ -1,29 +1,38 @@
 package com.merrymeal.mealsonwheels.controller;
 
 import com.merrymeal.mealsonwheels.dto.*;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.CaregiverProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.MemberProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.PartnerProfileDTO;
-import com.merrymeal.mealsonwheels.dto.roleDTOs.VolunteerProfileDTO;
+import com.merrymeal.mealsonwheels.dto.order.AssignRiderRequest;
+import com.merrymeal.mealsonwheels.dto.order.MemberOrderDTO;
+import com.merrymeal.mealsonwheels.dto.roleDTOs.*;
 import com.merrymeal.mealsonwheels.model.VolunteerProfile;
 import com.merrymeal.mealsonwheels.service.adminService.AdminService;
 
+import com.merrymeal.mealsonwheels.service.mealOrderService.OrderService;
+import com.merrymeal.mealsonwheels.service.roleService.RiderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin")
-@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "http://localhost:5173")
 public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private RiderService riderService;
 
     // ✅ USER MANAGEMENT
     @PutMapping("/approve-user/{id}")
@@ -171,6 +180,55 @@ public class AdminController {
         return ResponseEntity.ok(adminService.updateAdminInfo(updatedDTO));
     }
 
+    @GetMapping("/members-with-orders")
+    public ResponseEntity<?> getMembers() {
+        try {
+            List<MemberOrderDTO> data = orderService.getMembersWithOrders();
+            return ResponseEntity.ok(data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/caregivers-with-orders")
+    public ResponseEntity<?> getCaregivers() {
+        try {
+            List<MemberOrderDTO> manageDelivery = orderService.getCaregiversWithOrders();
+            return ResponseEntity.ok(manageDelivery);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/orders/{orderId}/assign-rider/{riderId}")
+    public ResponseEntity<String> assignRiderToOrder(
+            @PathVariable Long orderId,
+            @PathVariable Long riderId) {
+        try {
+            adminService.assignRiderToOrder(orderId, riderId);
+            return ResponseEntity.ok("Rider assigned to order successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to assign rider.");
+        }
+    }
+
+    @GetMapping("/approved-riders")
+    public ResponseEntity<List<RiderProfileDTO>> getApprovedRiders() {
+        List<RiderProfileDTO> approved = riderService.getApprovedRiders();
+        return ResponseEntity.ok(approved);
+    }
+
+    @PostMapping("/assign-rider/{orderId}")
+    public ResponseEntity<?> assignRiderToOrder(
+            @PathVariable Long orderId,
+            @RequestBody Map<String, Long> requestBody) {
+        Long riderId = requestBody.get("riderId");
+        return orderService.assignRider(orderId, riderId);
+    }
 
 
 
