@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import axiosInstance from '../../api/axiosInstance';
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axiosInstance";
 
 const MealDetailsPage = () => {
   const [meals, setMeals] = useState([]);
@@ -13,6 +13,7 @@ const MealDetailsPage = () => {
 
   useEffect(() => {
     const fetchMeals = async () => {
+      const delay = new Promise((resolve) => setTimeout(resolve, 3000)); // ⏳ Minimum 3 seconds
       try {
         const storedUser = JSON.parse(localStorage.getItem("user"));
         const role = storedUser?.role;
@@ -32,10 +33,14 @@ const MealDetailsPage = () => {
         }
 
         const mealRes = await axiosInstance.get(endpoint);
+        await delay; // ⏳ Wait even if data is already available
         setMeals(mealRes.data);
       } catch (err) {
         console.error("Failed to fetch meals:", err);
-        setError("No current meal available. Please come back again later. Thank you!");
+        await delay; // Ensure the bowing gif is shown
+        setError(
+          "No current meal available. Please come back again later. Thank you!"
+        );
       } finally {
         setLoading(false);
       }
@@ -47,7 +52,7 @@ const MealDetailsPage = () => {
   const handleQuantityChange = (mealId, value) => {
     setQuantities((prev) => ({
       ...prev,
-      [mealId]: value
+      [mealId]: value,
     }));
   };
 
@@ -57,13 +62,13 @@ const MealDetailsPage = () => {
     if (value < 1) {
       setQuantityErrors((prev) => ({
         ...prev,
-        [mealId]: 'Minimum quantity is 1'
+        [mealId]: "Minimum quantity is 1",
       }));
       handleQuantityChange(mealId, 1);
     } else {
       setQuantityErrors((prev) => ({
         ...prev,
-        [mealId]: null
+        [mealId]: null,
       }));
       handleQuantityChange(mealId, value);
     }
@@ -73,7 +78,11 @@ const MealDetailsPage = () => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user"));
 
-    if (!token || !user || (user.role !== "MEMBER" && user.role !== "CAREGIVER")) {
+    if (
+      !token ||
+      !user ||
+      (user.role !== "MEMBER" && user.role !== "CAREGIVER")
+    ) {
       alert("Please log in as a member or caregiver.");
       return;
     }
@@ -98,7 +107,7 @@ const MealDetailsPage = () => {
         mealType: meal.mealType,
         mealDietary: meal.mealDietary,
         partnerId: meal.partnerId,
-      }
+      },
     };
 
     try {
@@ -122,12 +131,27 @@ const MealDetailsPage = () => {
         <h1 className="text-2xl font-bold text-center mb-6">ORDER HERE</h1>
 
         <p className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded text-sm text-gray-800 mb-8">
-          Meals shown here are available today. Whether you receive them as <strong>hot</strong> or <strong>frozen</strong> will depend on your location.
+          Meals shown here are available today. Whether you receive them as{" "}
+          <strong>hot</strong> or <strong>frozen</strong> will depend on your
+          location.
         </p>
 
-        {loading && <p className="text-center text-gray-500">Loading meals...</p>}
+        {/* Loading (Always 3s minimum) */}
+        {loading && (
+          <div className="text-center">
+            <p className="text-gray-900">
+              Fetching today's meals... Please wait.
+            </p>
+            <img
+              src="/images/bow.gif"
+              alt="bow"
+              className="w-full max-w-xs mx-auto my-4"
+            />
+          </div>
+        )}
 
-        {error && (
+        {/* Error */}
+        {!loading && error && (
           <div className="text-center">
             <p className="text-gray-900">{error}</p>
             <img
@@ -138,6 +162,7 @@ const MealDetailsPage = () => {
           </div>
         )}
 
+        {/* Meals List */}
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-6xl mx-auto">
             {meals.map((meal) => (
@@ -156,7 +181,8 @@ const MealDetailsPage = () => {
 
                   <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
                     <div className="text-sm text-gray-700">
-                      <strong>Created:</strong> {meal.mealCreatedDate?.slice(0, 10)}
+                      <strong>Created:</strong>{" "}
+                      {meal.mealCreatedDate?.slice(0, 10)}
                     </div>
                     <div className="text-sm text-gray-500 italic">
                       *Delivery type depends on your distance.
@@ -164,7 +190,10 @@ const MealDetailsPage = () => {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor={`qty-${meal.id}`} className="text-sm block mb-1">
+                    <label
+                      htmlFor={`qty-${meal.id}`}
+                      className="text-sm block mb-1"
+                    >
                       Quantity:
                     </label>
                     <input
@@ -194,8 +223,8 @@ const MealDetailsPage = () => {
                       disabled={isSubmittingId === meal.id}
                       className={`w-full text-center px-4 py-2 rounded text-white ${
                         isSubmittingId === meal.id
-                          ? 'bg-blue-300 cursor-not-allowed'
-                          : 'bg-blue-500 hover:bg-blue-600'
+                          ? "bg-blue-300 cursor-not-allowed"
+                          : "bg-blue-500 hover:bg-blue-600"
                       }`}
                     >
                       {isSubmittingId === meal.id ? "Placing..." : "Order Now"}
